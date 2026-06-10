@@ -117,27 +117,39 @@ const Exam = () => {
   const selectedOptionId = answers[currentQuestion.id];
   const isAnswered = !!selectedOptionId;
 
-  const handleMouseUp = () => {
-    if (!answers[currentQuestion?.id] || isPaused) return;
-
-    setTimeout(() => {
-      const selection = window.getSelection();
-      const text = selection.toString().trim();
+  useEffect(() => {
+    let timeoutId;
+    
+    const handleSelectionChange = () => {
+      clearTimeout(timeoutId);
       
-      if (text && text.length > 0) {
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
+      timeoutId = setTimeout(() => {
+        if (!currentQuestion || !answers[currentQuestion.id] || isPaused) return;
         
-        if (rect.width > 0) {
-          setTranslationContext({
-            text,
-            x: rect.left + rect.width / 2,
-            y: rect.top + window.scrollY,
-          });
+        const selection = window.getSelection();
+        const text = selection.toString().trim();
+        
+        if (text && text.length > 0) {
+          const range = selection.getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          
+          if (rect.width > 0) {
+            setTranslationContext({
+              text,
+              x: rect.left + rect.width / 2,
+              y: rect.top + window.scrollY,
+            });
+          }
         }
-      }
-    }, 10);
-  };
+      }, 500);
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+      clearTimeout(timeoutId);
+    };
+  }, [answers, currentQuestion, isPaused]);
 
   const handleOptionSelect = (optionId) => {
     if (isAnswered || isPaused) return;
@@ -251,7 +263,7 @@ const Exam = () => {
         portalTarget
       )}
 
-      <div className="question-container glass-panel" style={{ position: 'relative' }} onMouseUp={handleMouseUp}>
+      <div className="question-container glass-panel" style={{ position: 'relative' }}>
         {isPaused && (
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', clipPath: 'polygon(0 0, 100% 2%, 98% 100%, 2% 98%)' }}>
             <Pause size={64} style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }} />
