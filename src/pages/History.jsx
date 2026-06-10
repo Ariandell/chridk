@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getHistory, clearHistory } from '../utils/history';
 import { ArrowLeft, Trash2, Calendar as CalendarIcon, Skull, CheckCircle2, ChevronRight, X } from 'lucide-react';
+import calendarBg from '../assets/persona-5-calendar-background-ripped-from-the-ps4-ver-and-v0-e_WvRTzU3h8NRiSkXxtrDzSxL89fFBwXiSA-wTmvSCI.webp';
 
 const DEADLINE_DATE = '2026-06-26';
 
@@ -187,7 +188,7 @@ const History = () => {
       <div style={{ 
         width: '100vw', 
         marginLeft: 'calc(-50vw + 50%)', 
-        backgroundImage: 'url("/p5-calendar-bg.png")',
+        backgroundImage: `url(${calendarBg})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         padding: '5rem 0',
@@ -195,7 +196,8 @@ const History = () => {
         borderBottom: '5px solid #000',
         boxShadow: 'inset 0 0 100px rgba(0,0,0,1)',
         marginBottom: '3rem',
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden'
       }}>
         {/* Dark overlay for readability */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 0 }} />
@@ -272,8 +274,8 @@ const History = () => {
               >
                 {/* Sword for TODAY */}
                 {isToday && (
-                  <div style={{ position: 'absolute', top: '-60px', right: '-40px', transform: 'rotate(45deg)', zIndex: 10, filter: 'drop-shadow(5px 5px 0px rgba(0,0,0,1))' }}>
-                    <svg width="100" height="100" viewBox="0 0 24 24" fill="white" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <div style={{ position: 'absolute', top: '-70px', right: '-30px', transform: 'rotate(30deg)', zIndex: 10, filter: 'drop-shadow(5px 5px 0px rgba(0,0,0,1))' }}>
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="white" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14.5 17.5L3 6V3h3l11.5 11.5" />
                       <path d="M13 19l6-6" />
                       <path d="M16 16l4 4" />
