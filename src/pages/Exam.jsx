@@ -10,6 +10,7 @@ import germanHints from '../data/tests/german_grammar_hints.json';
 import { saveTestResult } from '../utils/history';
 import { getImagePath } from '../utils/imagePath';
 import GeminiAssistant from '../components/GeminiAssistant';
+import TranslatorTooltip from '../components/TranslatorTooltip';
 
 const TEST_DATA = {
   efvv_it: efvvData,
@@ -66,6 +67,7 @@ const Exam = () => {
   const [pauseTimeLeft, setPauseTimeLeft] = useState(300); // 5 minutes max pause
   const [expandedOptions, setExpandedOptions] = useState({}); // { optionId: boolean }
   const [portalTarget, setPortalTarget] = useState(null);
+  const [translationContext, setTranslationContext] = useState(null);
 
   useEffect(() => {
     setPortalTarget(document.getElementById('header-portal-target'));
@@ -75,6 +77,7 @@ const Exam = () => {
   useEffect(() => {
     setExpandedOptions({});
     setShowHint(false); // Reset hint visibility
+    setTranslationContext(null);
   }, [currentQuestionIdx]);
 
   useEffect(() => {
@@ -113,6 +116,28 @@ const Exam = () => {
   const currentQuestion = data.questions[currentQuestionIdx];
   const selectedOptionId = answers[currentQuestion.id];
   const isAnswered = !!selectedOptionId;
+
+  const handleMouseUp = () => {
+    if (!answers[currentQuestion?.id] || isPaused) return;
+
+    setTimeout(() => {
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
+      
+      if (text && text.length > 0) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
+        if (rect.width > 0) {
+          setTranslationContext({
+            text,
+            x: rect.left + rect.width / 2,
+            y: rect.top + window.scrollY,
+          });
+        }
+      }
+    }, 10);
+  };
 
   const handleOptionSelect = (optionId) => {
     if (isAnswered || isPaused) return;
@@ -226,7 +251,7 @@ const Exam = () => {
         portalTarget
       )}
 
-      <div className="question-container glass-panel" style={{ position: 'relative' }}>
+      <div className="question-container glass-panel" style={{ position: 'relative' }} onMouseUp={handleMouseUp}>
         {isPaused && (
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', clipPath: 'polygon(0 0, 100% 2%, 98% 100%, 2% 98%)' }}>
             <Pause size={64} style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }} />
@@ -472,7 +497,7 @@ const Exam = () => {
         )}
       </div>
 
-
+      <TranslatorTooltip context={translationContext} onClose={() => setTranslationContext(null)} />
     </div>
   );
 };

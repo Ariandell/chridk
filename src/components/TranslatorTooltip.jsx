@@ -1,0 +1,122 @@
+import { useState, useEffect, useRef } from 'react';
+import { Loader2, Languages, X } from 'lucide-react';
+
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${API_KEY}`;
+
+const TranslatorTooltip = ({ context, onClose }) => {
+  const [translation, setTranslation] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const tooltipRef = useRef(null);
+
+  useEffect(() => {
+    if (!context || !context.text) return;
+
+    const translateText = async () => {
+      setLoading(true);
+      setError('');
+      setTranslation('');
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Translate the following text to Ukrainian. Return ONLY the translation, without quotes, explanations or original text. Here is the text:\n\n${context.text}`
+              }]
+            }]
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Translation failed');
+        }
+
+        const data = await response.json();
+        const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Переклад не знайдено';
+        setTranslation(result);
+      } catch (err) {
+        setError('Помилка перекладу. Спробуйте ще раз.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    translateText();
+  }, [context.text]);
+
+  // Handle clicking outside to close
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (tooltipRef.current && !tooltipRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+
+    // Use a slight delay so the current click doesn't immediately close it
+    setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 10);
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
+
+  if (!context) return null;
+
+  // Position logic: try to center above the selection
+  const style = {
+    position: 'absolute',
+    left: `${context.x}px`,
+    top: `${context.y - 10}px`,
+    transform: 'translate(-50%, -100%)',
+    zIndex: 1000,
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    borderRadius: '12px',
+    padding: '12px 16px',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+    maxWidth: '300px',
+    minWidth: '200px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    animation: 'slideUp 0.2s ease-out'
+  };
+
+  return (
+    <div ref={tooltipRef} style={style} className="translator-tooltip">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: '600' }}>
+          <Languages size={14} />
+          <span>Переклад</span>
+        </div>
+        <button 
+          onClick={onClose}
+          style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center' }}
+        >
+          <X size={14} />
+        </button>
+      </div>
+      
+      <div style={{ fontSize: '0.95rem', lineHeight: '1.4', color: 'var(--text-primary)' }}>
+        {loading ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+            <Loader2 size={16} className="animate-spin" />
+            Перекладаю...
+          </div>
+        ) : error ? (
+          <span style={{ color: '#ef4444' }}>{error}</span>
+        ) : (
+          translation
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TranslatorTooltip;
