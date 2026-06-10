@@ -11,6 +11,7 @@ import { saveTestResult } from '../utils/history';
 import { getImagePath } from '../utils/imagePath';
 import GeminiAssistant from '../components/GeminiAssistant';
 import TranslatorTooltip from '../components/TranslatorTooltip';
+import { getSessionById } from '../utils/testModes';
 
 const TEST_DATA = {
   efvv_it: efvvData,
@@ -56,7 +57,7 @@ const Exam = () => {
   const navigate = useNavigate();
   
   const subject = TEST_DATA[subjectId];
-  const data = subject?.sessions?.find(s => s.id === sessionId);
+  const data = getSessionById(subject, sessionId);
 
   const getInitialProgress = () => {
     try {

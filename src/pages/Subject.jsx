@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Clock, ArrowLeft } from 'lucide-react';
 import efvvData from '../data/tests/efvv_it.json';
 import tznkData from '../data/tests/tznk.json';
 import eviData from '../data/tests/evi_german.json';
+import { getSessionsForSubject } from '../utils/testModes';
 
 const TEST_DATA = {
   efvv_it: efvvData,
@@ -15,8 +16,14 @@ const Subject = () => {
   const { subjectId } = useParams();
   const navigate = useNavigate();
   const subject = TEST_DATA[subjectId];
+  
+  const [isBlockMode, setIsBlockMode] = useState(false);
 
   if (!subject) return null;
+
+  const displaySessions = getSessionsForSubject(subject, isBlockMode);
+  
+  const hasLargeTest = subject.sessions.some(s => s.questions.length > 50);
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '4rem' }}>
@@ -33,8 +40,22 @@ const Subject = () => {
       </h1>
       <p className="text-secondary mb-8">{subject.description}</p>
 
+      {hasLargeTest && (
+        <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: 'var(--bg-glass)', padding: '0.5rem 1rem', borderRadius: '8px', border: '2px solid var(--border-color)' }}>
+            <input 
+              type="checkbox" 
+              checked={isBlockMode} 
+              onChange={(e) => setIsBlockMode(e.target.checked)}
+              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+            />
+            <span style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>Режим блоків (по 30 питань)</span>
+          </label>
+        </div>
+      )}
+
       <div className="subjects-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))' }}>
-        {subject.sessions && subject.sessions.map((session) => (
+        {displaySessions && displaySessions.map((session) => (
           <div key={session.id} className="subject-card glass-panel" style={{ padding: '1.5rem' }}>
             <h3 style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>{session.title}</h3>
             
