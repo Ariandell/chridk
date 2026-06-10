@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getHistory, clearHistory } from '../utils/history';
 import { ArrowLeft, Trash2, Calendar as CalendarIcon, Skull, CheckCircle2, ChevronRight, X } from 'lucide-react';
 import calendarBg from '../assets/persona-5-calendar-background-ripped-from-the-ps4-ver-and-v0-e_WvRTzU3h8NRiSkXxtrDzSxL89fFBwXiSA-wTmvSCI.webp';
+import daggerImg from '../assets/pngegg.png';
 
 const DEADLINE_DATE = '2026-06-26';
 
@@ -274,15 +275,8 @@ const History = () => {
               >
                 {/* Sword for TODAY */}
                 {isToday && (
-                  <div style={{ position: 'absolute', top: '-70px', right: '-30px', transform: 'rotate(30deg)', zIndex: 10, filter: 'drop-shadow(5px 5px 0px rgba(0,0,0,1))' }}>
-                    <svg width="80" height="80" viewBox="0 0 24 24" fill="white" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M14.5 17.5L3 6V3h3l11.5 11.5" />
-                      <path d="M13 19l6-6" />
-                      <path d="M16 16l4 4" />
-                      <path d="M19 21l2-2" />
-                      <path d="M14.5 14.5L18 11" />
-                      <path d="M10 10l-4 4" />
-                    </svg>
+                  <div style={{ position: 'absolute', top: '-110px', right: '-80px', transform: 'rotate(-10deg)', zIndex: 10, pointerEvents: 'none', filter: 'drop-shadow(10px 10px 5px rgba(0,0,0,0.8))' }}>
+                    <img src={daggerImg} alt="Dagger" style={{ width: '150px', height: 'auto', objectFit: 'contain' }} />
                   </div>
                 )}
 
