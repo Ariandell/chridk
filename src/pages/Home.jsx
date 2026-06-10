@@ -55,37 +55,61 @@ const Home = () => {
       </div>
 
       {dailies && dailies.quests && dailies.quests.length > 0 && (
-        <div className="glass-panel" style={{ maxWidth: '800px', margin: '0 auto 3rem auto', padding: '2rem', border: '3px solid var(--accent-primary)', clipPath: 'polygon(0 0, 100% 2%, 98% 100%, 2% 98%)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--border-color)', paddingBottom: '1rem' }}>
-            <Target size={28} color="var(--accent-primary)" />
-            <h2 style={{ fontSize: '1.8rem', margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Щоденні Завдання</h2>
-          </div>
+        <div style={{ maxWidth: '800px', margin: '0 auto 4rem auto', position: 'relative' }}>
+          {/* Persona-style background accent */}
+          <div style={{ position: 'absolute', top: '-10px', left: '-10px', right: '10px', bottom: '10px', background: 'var(--accent-primary)', clipPath: 'polygon(2% 0, 100% 4%, 98% 100%, 0 96%)', zIndex: 0 }} />
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {dailies.quests.map((quest) => (
-              <div key={quest.id} style={{ background: 'var(--bg-secondary)', padding: '1rem', border: '2px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ flexGrow: 1 }}>
-                  <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: quest.completed ? 'var(--success)' : 'var(--text-primary)' }}>
-                    {quest.text}
-                  </h4>
-                  <div style={{ background: 'var(--bg-primary)', height: '12px', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                    <div style={{ 
-                      width: `${Math.min(100, (quest.progress / quest.target) * 100)}%`, 
-                      height: '100%', 
-                      background: quest.completed ? 'var(--success)' : 'var(--accent-primary)',
-                      transition: 'width 0.5s ease'
-                    }} />
+          <div style={{ position: 'relative', zIndex: 1, background: '#121217', padding: '2rem', clipPath: 'polygon(0 0, 100% 2%, 99% 100%, 1% 98%)', border: '2px solid var(--text-primary)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '2rem' }}>
+              <div style={{ background: 'var(--accent-primary)', padding: '0.5rem', clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(-10deg)' }}>
+                <Target size={28} color="#000" />
+              </div>
+              <h2 style={{ fontSize: '2rem', margin: 0, textTransform: 'uppercase', fontWeight: '900', letterSpacing: '2px', textShadow: '2px 2px 0 var(--accent-primary)', transform: 'rotate(-2deg)' }}>Щоденні Завдання</h2>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              {dailies.quests.map((quest) => (
+                <div key={quest.id} style={{ 
+                  background: quest.completed ? 'rgba(6, 214, 160, 0.1)' : 'var(--bg-secondary)', 
+                  padding: '1.2rem', 
+                  border: `2px solid ${quest.completed ? 'var(--success)' : 'var(--border-color)'}`, 
+                  display: 'flex', alignItems: 'center', gap: '1rem',
+                  clipPath: 'polygon(0 0, 100% 0, 99% 100%, 1% 100%)',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <div style={{ fontSize: '2rem', filter: quest.completed ? 'none' : 'grayscale(100%)', opacity: quest.completed ? 1 : 0.7 }}>
+                    {quest.icon || '🎯'}
+                  </div>
+                  
+                  <div style={{ flexGrow: 1 }}>
+                    <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: quest.completed ? 'var(--success)' : 'var(--text-primary)', textDecoration: quest.completed ? 'line-through' : 'none' }}>
+                      {quest.text}
+                    </h4>
+                    
+                    {!quest.completed && (
+                      <div style={{ background: 'var(--bg-primary)', height: '14px', borderRadius: '0', overflow: 'hidden', border: '1px solid var(--border-color)', transform: 'skewX(-15deg)' }}>
+                        <div style={{ 
+                          width: `${Math.min(100, (quest.progress / quest.target) * 100)}%`, 
+                          height: '100%', 
+                          background: quest.color || 'var(--accent-primary)',
+                          transition: 'width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                        }} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div style={{ fontWeight: '900', fontSize: '1.4rem', minWidth: '70px', textAlign: 'right', color: quest.completed ? 'var(--success)' : (quest.color || 'var(--accent-primary)'), transform: 'rotate(2deg)' }}>
+                    {quest.completed ? (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.3rem' }}>
+                        <CheckCircle2 size={28} />
+                      </div>
+                    ) : (
+                      `${quest.progress} / ${quest.target}`
+                    )}
                   </div>
                 </div>
-                <div style={{ marginLeft: '1.5rem', fontWeight: '900', fontSize: '1.2rem', minWidth: '80px', textAlign: 'right', color: quest.completed ? 'var(--success)' : 'var(--accent-primary)' }}>
-                  {quest.completed ? (
-                    <CheckCircle2 size={32} />
-                  ) : (
-                    `${quest.progress} / ${quest.target}`
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

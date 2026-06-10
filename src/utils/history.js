@@ -78,6 +78,7 @@ export const saveTestResult = (subjectId, sessionId, title, score, totalQuestion
       title,
       score,
       totalQuestions,
+      totalAnswered: answers ? Object.keys(answers).length : 0,
       answers
     };
     

@@ -1,12 +1,33 @@
 export const DAILIES_KEY = 'edutest_dailies';
 
+// Emoji tags for visual variety
 const QUEST_TEMPLATES = [
-  { id: 'pass_test', text: 'Пройти 1 будь-який тест', target: 1, type: 'pass_test' },
-  { id: 'correct_10', text: 'Дати 10 правильних відповідей', target: 10, type: 'correct_answers' },
-  { id: 'score_80', text: 'Пройти тест з результатом 80%+', target: 1, type: 'score_80' },
-  { id: 'correct_20', text: 'Дати 20 правильних відповідей', target: 20, type: 'correct_answers' },
-  { id: 'pass_efvv', text: 'Пройти тест ЄФВВ', target: 1, type: 'pass_specific', subjectId: 'efvv_it' },
-  { id: 'pass_tznk', text: 'Пройти тест ТЗНК', target: 1, type: 'pass_specific', subjectId: 'tznk' },
+  // === Pass-based ===
+  { id: 'pass_any_1', text: 'Пройти будь-який тест', icon: '📋', color: '#e63946', target: 1, type: 'pass_test' },
+  { id: 'pass_any_2', text: 'Пройти 2 тести поспіль', icon: '🔁', color: '#e63946', target: 2, type: 'pass_test' },
+  { id: 'pass_efvv', text: 'Пройти тест ЄФВВ', icon: '💻', color: '#e63946', target: 1, type: 'pass_specific', subjectId: 'efvv_it' },
+  { id: 'pass_tznk', text: 'Пройти тест ТЗНК', icon: '🧠', color: '#9b5de5', target: 1, type: 'pass_specific', subjectId: 'tznk' },
+  { id: 'pass_german', text: 'Пройти тест з Іноземної мови', icon: '🇩🇪', color: '#06d6a0', target: 1, type: 'pass_specific', subjectId: 'evi_german' },
+  { id: 'pass_block', text: 'Пройти блок тесту (режим блоків)', icon: '🧩', color: '#f4a261', target: 1, type: 'pass_block' },
+
+  // === Score-based ===
+  { id: 'score_70', text: 'Набрати 70%+ в будь-якому тесті', icon: '🥉', color: '#f4a261', target: 1, type: 'score_threshold', threshold: 70 },
+  { id: 'score_80', text: 'Набрати 80%+ в будь-якому тесті', icon: '🥈', color: '#ffd166', target: 1, type: 'score_threshold', threshold: 80 },
+  { id: 'score_90', text: 'Набрати 90%+ — ти монстр!', icon: '🥇', color: '#06d6a0', target: 1, type: 'score_threshold', threshold: 90 },
+
+  // === Correct answers ===
+  { id: 'correct_10', text: 'Дати 10 правильних відповідей', icon: '✅', color: '#06d6a0', target: 10, type: 'correct_answers' },
+  { id: 'correct_25', text: 'Дати 25 правильних відповідей', icon: '✅', color: '#06d6a0', target: 25, type: 'correct_answers' },
+  { id: 'correct_50', text: 'Дати 50 правильних відповідей за день', icon: '🔥', color: '#e63946', target: 50, type: 'correct_answers' },
+
+  // === Time-based / streak ===
+  { id: 'streak_3', text: 'Підтримуй стрік 3+ дні', icon: '🔥', color: '#e63946', target: 3, type: 'streak_min' },
+  { id: 'streak_7', text: 'Підтримуй стрік 7+ днів!', icon: '⚡', color: '#ffd166', target: 7, type: 'streak_min' },
+
+  // === Variety ===
+  { id: 'two_subjects', text: 'Пройди тести з 2 різних предметів', icon: '📚', color: '#9b5de5', target: 2, type: 'unique_subjects' },
+  { id: 'no_mistakes', text: 'Пройди тест без єдиної помилки (100%)', icon: '🏆', color: '#ffd166', target: 1, type: 'score_threshold', threshold: 100 },
+  { id: 'complete_session', text: 'Дай відповідь на всі питання в тесті', icon: '📝', color: '#4cc9f0', target: 1, type: 'full_attempt' },
 ];
 
 export const getDailies = () => {
@@ -28,18 +49,31 @@ const getYesterdayDate = () => {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 };
 
+// Seeded shuffle to keep same quests all day for the same date
+const seededShuffle = (arr, seed) => {
+  const a = [...arr];
+  let s = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    const j = Math.abs(s) % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+const dateSeed = (dateStr) => dateStr.split('-').reduce((acc, n) => acc * 31 + parseInt(n), 0);
+
 export const initializeDailies = () => {
   const today = getTodayDate();
   const current = getDailies();
   
   if (!current || current.lastQuestDate !== today) {
-    // Generate new quests
-    const shuffled = [...QUEST_TEMPLATES].sort(() => 0.5 - Math.random());
+    // Same 3 quests all day (seeded by date)
+    const shuffled = seededShuffle(QUEST_TEMPLATES, dateSeed(today));
     const selectedQuests = shuffled.slice(0, 3).map(q => ({ ...q, progress: 0, completed: false }));
     
-    // Update streak logic
+    // Streak logic
     let newStreak = current ? current.streak : 0;
-    // If lastLoginDate was not today and not yesterday, break streak
     if (current && current.lastLoginDate !== today && current.lastLoginDate !== getYesterdayDate()) {
       newStreak = 0;
     }
@@ -49,7 +83,8 @@ export const initializeDailies = () => {
       quests: selectedQuests,
       lastQuestDate: today,
       lastLoginDate: current?.lastLoginDate || '',
-      streak: newStreak
+      streak: newStreak,
+      uniqueSubjectsToday: []
     };
     
     localStorage.setItem(DAILIES_KEY, JSON.stringify(newData));
@@ -62,9 +97,8 @@ export const initializeDailies = () => {
 export const processTestResultForDailies = (result) => {
   const dailies = initializeDailies();
   const today = getTodayDate();
-  let updated = false;
   
-  // Update streak if this is the first test passed today
+  // Update streak
   if (dailies.lastLoginDate !== today) {
     if (dailies.lastLoginDate === getYesterdayDate()) {
       dailies.streak += 1;
@@ -72,34 +106,55 @@ export const processTestResultForDailies = (result) => {
       dailies.streak = 1;
     }
     dailies.lastLoginDate = today;
-    updated = true;
   }
   
-  // Process quests
+  // Track unique subjects seen today
+  if (!dailies.uniqueSubjectsToday) dailies.uniqueSubjectsToday = [];
+  if (!dailies.uniqueSubjectsToday.includes(result.subjectId)) {
+    dailies.uniqueSubjectsToday.push(result.subjectId);
+  }
+
+  const percentage = Math.round((result.score / result.totalQuestions) * 100);
+  const isBlockSession = result.sessionId && result.sessionId.includes('_block_');
+  const allAnswered = result.totalAnswered === result.totalQuestions;
+  
+  // Process each quest
   dailies.quests.forEach(quest => {
     if (quest.completed) return;
     
-    if (quest.type === 'pass_test') {
-      quest.progress += 1;
-    } else if (quest.type === 'correct_answers') {
-      quest.progress += result.score;
-    } else if (quest.type === 'score_80') {
-      const percentage = (result.score / result.totalQuestions) * 100;
-      if (percentage >= 80) quest.progress += 1;
-    } else if (quest.type === 'pass_specific') {
-      if (result.subjectId === quest.subjectId) quest.progress += 1;
+    switch (quest.type) {
+      case 'pass_test':
+        quest.progress += 1;
+        break;
+      case 'pass_specific':
+        if (result.subjectId === quest.subjectId) quest.progress += 1;
+        break;
+      case 'pass_block':
+        if (isBlockSession) quest.progress += 1;
+        break;
+      case 'correct_answers':
+        quest.progress += result.score;
+        break;
+      case 'score_threshold':
+        if (percentage >= quest.threshold) quest.progress += 1;
+        break;
+      case 'unique_subjects':
+        quest.progress = dailies.uniqueSubjectsToday.length;
+        break;
+      case 'streak_min':
+        quest.progress = dailies.streak;
+        break;
+      case 'full_attempt':
+        if (allAnswered) quest.progress += 1;
+        break;
     }
     
     if (quest.progress >= quest.target) {
       quest.progress = quest.target;
       quest.completed = true;
     }
-    updated = true;
   });
   
-  if (updated) {
-    localStorage.setItem(DAILIES_KEY, JSON.stringify(dailies));
-  }
-  
+  localStorage.setItem(DAILIES_KEY, JSON.stringify(dailies));
   return dailies;
 };
