@@ -23,9 +23,11 @@ const Results = () => {
   
   data.questions.forEach((q) => {
     const selectedOptionId = answers[q.id];
-    const correctOption = q.options.find(o => o.isCorrect);
-    if (selectedOptionId === correctOption.id) {
-      correctCount++;
+    if (selectedOptionId && q.options) {
+      const correctOption = q.options.find(o => o.isCorrect);
+      if (correctOption && selectedOptionId === correctOption.id) {
+        correctCount++;
+      }
     }
   });
 
