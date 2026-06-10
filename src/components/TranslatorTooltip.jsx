@@ -48,7 +48,7 @@ const TranslatorTooltip = ({ context, onClose }) => {
     };
 
     translateText();
-  }, [context.text]);
+  }, [context?.text]);
 
   // Handle clicking outside to close
   useEffect(() => {
