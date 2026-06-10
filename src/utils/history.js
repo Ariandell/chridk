@@ -26,14 +26,25 @@ export const syncProgressWithCloud = async (uid) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       if (data && data.history && Array.isArray(data.history)) {
-        if (data.history.length > 0) {
-          localStorage.setItem(HISTORY_KEY, JSON.stringify(data.history));
-        } else {
-          // Cloud is empty, push local to cloud
-          const local = getHistory();
-          if (local.length > 0) {
-            await pushToCloud(local, getDailies());
+        const local = getHistory();
+        
+        // Merge cloud and local history to prevent data loss
+        const mergedHistory = [...data.history];
+        let hasNewLocalItems = false;
+        
+        local.forEach(localItem => {
+          if (!mergedHistory.find(m => m.id === localItem.id)) {
+            mergedHistory.push(localItem);
+            hasNewLocalItems = true;
           }
+        });
+
+        // Save merged result to local
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(mergedHistory));
+        
+        // If we had local items that weren't in cloud, push the merged array back to cloud
+        if (hasNewLocalItems) {
+          await pushToCloud(mergedHistory, getDailies());
         }
       }
       if (data && data.dailies) {
