@@ -362,7 +362,7 @@ const Exam = () => {
           </div>
         )}
 
-        <div className="question-text" style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '2rem' }}>
+        <div className="question-text" style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '2rem' }}>
           {currentQuestion.text}
           {currentQuestion.originalImageUrl && (
             <div style={{ marginTop: '1rem' }}>
