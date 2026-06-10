@@ -1,15 +1,16 @@
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from './firebase';
+import { processTestResultForDailies, getDailies, initializeDailies, DAILIES_KEY } from './dailies';
 
 export const HISTORY_KEY = 'edutest_history';
 
 // Helper to push history to cloud if logged in
-const pushToCloud = async (historyData) => {
+const pushToCloud = async (historyData, dailiesData) => {
   const user = auth.currentUser;
   if (!user) return;
   try {
     const userRef = doc(db, 'users', user.uid);
-    await setDoc(userRef, { history: historyData }, { merge: true });
+    await setDoc(userRef, { history: historyData, dailies: dailiesData }, { merge: true });
   } catch (err) {
     console.error('Background sync failed:', err);
   }
@@ -31,15 +32,22 @@ export const syncProgressWithCloud = async (uid) => {
           // Cloud is empty, push local to cloud
           const local = getHistory();
           if (local.length > 0) {
-            await pushToCloud(local);
+            await pushToCloud(local, getDailies());
           }
+        }
+      }
+      if (data && data.dailies) {
+        // Only load dailies from cloud if they are newer or we don't have them
+        const localDailies = getDailies();
+        if (!localDailies || data.dailies.lastLoginDate >= (localDailies.lastLoginDate || '')) {
+           localStorage.setItem(DAILIES_KEY, JSON.stringify(data.dailies));
         }
       }
     } else {
       // Document doesn't exist yet, push local to cloud
       const local = getHistory();
-      if (local.length > 0) {
-        await pushToCloud(local);
+      if (local.length > 0 || getDailies()) {
+        await pushToCloud(local, getDailies());
       }
     }
   } catch (err) {
@@ -65,8 +73,11 @@ export const saveTestResult = (subjectId, sessionId, title, score, totalQuestion
     history.push(newEntry);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
     
+    // Process dailies
+    const newDailies = processTestResultForDailies(newEntry);
+    
     // Background sync
-    pushToCloud(history);
+    pushToCloud(history, newDailies);
     
     return newEntry;
   } catch (error) {
@@ -90,7 +101,7 @@ export const clearHistory = () => {
   try {
     localStorage.removeItem(HISTORY_KEY);
     // Overwrite cloud with empty array if logged in
-    pushToCloud([]);
+    pushToCloud([], getDailies());
   } catch (error) {
     console.error("Failed to clear history:", error);
   }

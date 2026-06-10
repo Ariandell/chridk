@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Flame } from 'lucide-react';
 import UserMenu from './UserMenu';
+import { getDailies, initializeDailies } from '../utils/dailies';
 
 const Header = () => {
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    const dailies = initializeDailies();
+    setStreak(dailies?.streak || 0);
+  }, []);
+
   return (
     <div style={{ position: 'sticky', top: '0', zIndex: 100, marginBottom: '2rem' }}>
       <header className="app-header persona-header" style={{ 
@@ -33,6 +41,11 @@ const Header = () => {
         </Link>
         <div id="header-portal-target" style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: 'auto', transform: 'rotate(1deg)' }}>
           {/* Exam controls will portal here */}
+          {streak > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#ff6b6b', fontWeight: 'bold', fontSize: '1.1rem', background: 'rgba(217, 15, 35, 0.1)', padding: '0.3rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(217, 15, 35, 0.3)' }}>
+              <Flame size={18} color="#ff6b6b" /> {streak}
+            </div>
+          )}
           <UserMenu />
         </div>
       </header>
