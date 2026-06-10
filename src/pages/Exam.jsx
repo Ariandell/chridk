@@ -58,16 +58,33 @@ const Exam = () => {
   const subject = TEST_DATA[subjectId];
   const data = subject?.sessions?.find(s => s.id === sessionId);
 
-  const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
+  const getInitialProgress = () => {
+    try {
+      const saved = localStorage.getItem(`exam_progress_${subjectId}_${sessionId}`);
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  };
+  const savedProgress = getInitialProgress();
+
+  const [currentQuestionIdx, setCurrentQuestionIdx] = useState(savedProgress?.currentQuestionIdx || 0);
   const [showHint, setShowHint] = useState(false);
-  const [answers, setAnswers] = useState({}); // { questionId: selectedOptionId }
-  const [timeLeft, setTimeLeft] = useState(data ? (data.durationMinutes || 150) * 60 : 0);
+  const [answers, setAnswers] = useState(savedProgress?.answers || {}); // { questionId: selectedOptionId }
+  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? (data ? (data.durationMinutes || 150) * 60 : 0));
   const [isFinished, setIsFinished] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [pauseTimeLeft, setPauseTimeLeft] = useState(300); // 5 minutes max pause
   const [expandedOptions, setExpandedOptions] = useState({}); // { optionId: boolean }
   const [portalTarget, setPortalTarget] = useState(null);
   const [translationContext, setTranslationContext] = useState(null);
+
+  useEffect(() => {
+    if (!data || isFinished) return;
+    localStorage.setItem(`exam_progress_${subjectId}_${sessionId}`, JSON.stringify({
+      answers,
+      currentQuestionIdx,
+      timeLeft
+    }));
+  }, [answers, currentQuestionIdx, timeLeft, subjectId, sessionId, data, isFinished]);
 
   useEffect(() => {
     setPortalTarget(document.getElementById('header-portal-target'));
@@ -179,6 +196,7 @@ const Exam = () => {
 
   const handleFinish = () => {
     setIsFinished(true);
+    localStorage.removeItem(`exam_progress_${subjectId}_${sessionId}`);
     
     // Calculate score
     let score = 0;
@@ -435,7 +453,7 @@ const Exam = () => {
                   </div>
                   
                   {/* The info 'I' button inline inside the rectangle */}
-                  {isAnswered && questionHasExps && (isSelected || (option.isCorrect && !isSelected)) && (
+                  {isAnswered && questionHasExps && (
                     <div 
                       onClick={(e) => { e.stopPropagation(); toggleExpansion(option.id); }}
                       style={{

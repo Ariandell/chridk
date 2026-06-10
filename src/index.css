@@ -407,11 +407,11 @@ h1, h2, h3, h4, h5, h6 {
 /* Mobile Media Queries */
 @media (max-width: 768px) {
   .container {
-    padding: 1rem;
+    padding: 0.5rem;
   }
   
   .glass-panel {
-    padding: 1rem;
+    padding: 0.75rem;
     margin-bottom: 1rem;
   }
 
@@ -427,8 +427,8 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .option-btn {
-    padding: 0.75rem;
-    font-size: 0.95rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
     flex-direction: row;
     align-items: center;
   }
