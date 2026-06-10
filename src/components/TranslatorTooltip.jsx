@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Loader2, Languages, X } from 'lucide-react';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${API_KEY}`;
-
 const TranslatorTooltip = ({ context, onClose }) => {
   const [translation, setTranslation] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,17 +16,13 @@ const TranslatorTooltip = ({ context, onClose }) => {
       setTranslation('');
 
       try {
-        const response = await fetch(API_URL, {
+        const response = await fetch('/api/translate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `Translate the following text to Ukrainian. Return ONLY the translation, without quotes, explanations or original text. Here is the text:\n\n${context.text}`
-              }]
-            }]
+            text: context.text
           })
         });
 
@@ -38,8 +31,7 @@ const TranslatorTooltip = ({ context, onClose }) => {
         }
 
         const data = await response.json();
-        const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Переклад не знайдено';
-        setTranslation(result);
+        setTranslation(data.translation || 'Переклад не знайдено');
       } catch (err) {
         setError('Помилка перекладу. Спробуйте ще раз.');
       } finally {
