@@ -1,71 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth, googleProvider } from '../utils/firebase';
 import { LogOut, User } from 'lucide-react';
 import { syncProgressWithCloud } from '../utils/history';
-
-// A simple function to decode the JWT payload
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    return null;
-  }
-}
 
 const UserMenu = () => {
   const [user, setUser] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
-    // Load user from local storage on mount
-    const storedToken = localStorage.getItem('google_token');
-    if (storedToken) {
-      const decoded = parseJwt(storedToken);
-      if (decoded && decoded.exp * 1000 > Date.now()) {
-        setUser(decoded);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
         // Sync in the background on load
-        syncProgressWithCloud(storedToken).then(() => {
-           // Optionally dispatch a custom event if we want the UI to update without reload, 
-           // but since it's background sync, next navigation will show updated history.
-        });
-      } else {
-        localStorage.removeItem('google_token');
+        setIsSyncing(true);
+        try {
+          await syncProgressWithCloud(currentUser.uid);
+        } catch (err) {
+          console.error('Failed to sync progress on load:', err);
+        } finally {
+          setIsSyncing(false);
+        }
       }
-    }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const handleLoginSuccess = async (credentialResponse) => {
-    const token = credentialResponse.credential;
-    const decoded = parseJwt(token);
-    
-    if (decoded) {
-      localStorage.setItem('google_token', token);
-      setUser(decoded);
+  const handleLogin = async () => {
+    try {
+      setIsSyncing(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      const currentUser = result.user;
       
       // Attempt to sync after login
-      setIsSyncing(true);
-      try {
-        await syncProgressWithCloud(token);
-        // Force reload to apply synced data
-        window.location.reload();
-      } catch (err) {
-        console.error('Failed to sync progress:', err);
-      } finally {
-        setIsSyncing(false);
-      }
+      await syncProgressWithCloud(currentUser.uid);
+      // Force reload to apply synced data across all components
+      window.location.reload();
+    } catch (err) {
+      console.error('Login Failed:', err);
+      setIsSyncing(false);
     }
   };
 
-  const handleLogout = () => {
-    googleLogout();
-    localStorage.removeItem('google_token');
-    setUser(null);
-    window.location.reload();
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      window.location.reload();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   if (user) {
@@ -73,8 +57,12 @@ const UserMenu = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         {isSyncing && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Синхронізація...</span>}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
-          <img src={user.picture} alt="Avatar" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
-          <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{user.given_name || user.name}</span>
+          {user.photoURL ? (
+            <img src={user.photoURL} alt="Avatar" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+          ) : (
+            <User size={24} />
+          )}
+          <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{user.displayName || user.email.split('@')[0]}</span>
         </div>
         <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem' }} title="Вийти">
           <LogOut size={16} />
@@ -85,16 +73,22 @@ const UserMenu = () => {
 
   return (
     <div className="google-login-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
-      <GoogleLogin
-        onSuccess={handleLoginSuccess}
-        onError={() => {
-          console.log('Login Failed');
-        }}
-        useOneTap
-        theme="filled_black"
-        shape="pill"
-        text="signin_with"
-      />
+      <button 
+        onClick={handleLogin} 
+        className="btn btn-primary" 
+        style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        disabled={isSyncing}
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
+            <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
+            <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"/>
+            <path fill="#FBBC05" d="M -21.484 53.529 C -21.734 52.809 -21.864 52.039 -21.864 51.239 C -21.864 50.439 -21.724 49.669 -21.484 48.949 L -21.484 45.859 L -25.464 45.859 C -26.284 47.479 -26.754 49.299 -26.754 51.239 C -26.754 53.179 -26.284 54.999 -25.464 56.619 L -21.484 53.529 Z"/>
+            <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
+          </g>
+        </svg>
+        {isSyncing ? 'Зачекайте...' : 'Увійти'}
+      </button>
     </div>
   );
 };

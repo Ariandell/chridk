@@ -1,37 +1,30 @@
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db, auth } from './firebase';
+
 export const HISTORY_KEY = 'edutest_history';
 
-// Helper to push history to cloud if token exists
+// Helper to push history to cloud if logged in
 const pushToCloud = async (historyData) => {
-  const token = localStorage.getItem('google_token');
-  if (!token) return;
+  const user = auth.currentUser;
+  if (!user) return;
   try {
-    await fetch('/api/progress', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ history: historyData })
-    });
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(userRef, { history: historyData }, { merge: true });
   } catch (err) {
     console.error('Background sync failed:', err);
   }
 };
 
 // Sync from cloud (called upon login)
-export const syncProgressWithCloud = async (token) => {
-  if (!token) return;
+export const syncProgressWithCloud = async (uid) => {
+  if (!uid) return;
   try {
-    const response = await fetch('/api/progress', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (response.ok) {
-      const data = await response.json();
+    const userRef = doc(db, 'users', uid);
+    const docSnap = await getDoc(userRef);
+    
+    if (docSnap.exists()) {
+      const data = docSnap.data();
       if (data && data.history && Array.isArray(data.history)) {
-        // Merge with local history or just replace?
-        // Let's replace for simplicity, assuming cloud is source of truth after login
         if (data.history.length > 0) {
           localStorage.setItem(HISTORY_KEY, JSON.stringify(data.history));
         } else {
@@ -41,6 +34,12 @@ export const syncProgressWithCloud = async (token) => {
             await pushToCloud(local);
           }
         }
+      }
+    } else {
+      // Document doesn't exist yet, push local to cloud
+      const local = getHistory();
+      if (local.length > 0) {
+        await pushToCloud(local);
       }
     }
   } catch (err) {
