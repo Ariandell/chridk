@@ -8,6 +8,7 @@ import eviData from '../data/tests/evi_german.json';
 import germanExps from '../data/tests/german_explanations.json';
 import germanHints from '../data/tests/german_grammar_hints.json';
 import { saveTestResult } from '../utils/history';
+import { getImagePath } from '../utils/imagePath';
 import GeminiAssistant from '../components/GeminiAssistant';
 
 const TEST_DATA = {
@@ -276,7 +277,7 @@ const Exam = () => {
         {/* Render standard image if it exists (not OCR'd) */}
         {currentQuestion.imageUrl && (
           <div style={{ marginBottom: '1.5rem', textAlign: 'center', background: 'var(--bg-primary)', padding: '1rem', border: '2px solid var(--border-color)' }}>
-            <img src={currentQuestion.imageUrl} alt="Question" style={{ maxWidth: '100%', height: 'auto' }} />
+            <img src={getImagePath(currentQuestion.imageUrl)} alt="Question" style={{ maxWidth: '100%', height: 'auto' }} />
           </div>
         )}
 
@@ -339,7 +340,7 @@ const Exam = () => {
               </div>
               {expandedOptions['main_scan'] && (
                 <div style={{ marginTop: '0.5rem', background: 'var(--bg-primary)', padding: '0.5rem', border: '2px solid var(--border-color)' }}>
-                  <img src={currentQuestion.originalImageUrl} alt="Original Scan" style={{ maxWidth: '100%', height: 'auto' }} />
+                  <img src={getImagePath(currentQuestion.originalImageUrl)} alt="Original Scan" style={{ maxWidth: '100%', height: 'auto' }} />
                 </div>
               )}
             </div>
@@ -378,7 +379,7 @@ const Exam = () => {
                     
                     {option.imageUrl && (
                       <div style={{ marginTop: '0.5rem', background: 'var(--bg-primary)', padding: '0.5rem', border: '2px solid var(--border-color)', display: 'inline-block' }}>
-                        <img src={option.imageUrl} alt="Option" style={{ maxWidth: '100%', height: 'auto' }} />
+                        <img src={getImagePath(option.imageUrl)} alt="Option" style={{ maxWidth: '100%', height: 'auto' }} />
                       </div>
                     )}
 
@@ -440,7 +441,7 @@ const Exam = () => {
                     )}
                     {expandedOptions[`${option.id}_scan`] && option.originalImageUrl && (
                       <div style={{ textAlign: 'center' }}>
-                        <img src={option.originalImageUrl} alt="Original Option Scan" style={{ maxWidth: '100%', height: 'auto', border: '2px solid var(--border-color)' }} />
+                        <img src={getImagePath(option.originalImageUrl)} alt="Original Option Scan" style={{ maxWidth: '100%', height: 'auto', border: '2px solid var(--border-color)' }} />
                       </div>
                     )}
                   </div>
