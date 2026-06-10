@@ -54,15 +54,15 @@ const UserMenu = () => {
 
   if (user) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {isSyncing && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Синхронізація...</span>}
+      <div className="user-menu-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+        {isSyncing && <div style={{ width: '14px', height: '14px', border: '2px solid var(--accent-primary)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} title="Синхронізація..." />}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
           {user.photoURL ? (
             <img src={user.photoURL} alt="Avatar" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
           ) : (
             <User size={24} />
           )}
-          <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{user.displayName || user.email.split('@')[0]}</span>
+          <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{user.displayName || user.email.split('@')[0]}</span>
         </div>
         <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem' }} title="Вийти">
           <LogOut size={16} />

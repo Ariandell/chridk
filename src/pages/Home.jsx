@@ -45,7 +45,7 @@ const Home = () => {
         Підготуйтесь до ЄВІ, ТЗНК та ЄФВВ на максимальний бал.
       </p>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '3rem' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', marginBottom: '3rem' }}>
         <button className="btn btn-primary" onClick={() => navigate('/braindead')} style={{ padding: '1rem 2rem', fontSize: '1.2rem', background: 'var(--accent-primary)' }}>
           <Flame size={24} /> BRAINDEAD MODE
         </button>
