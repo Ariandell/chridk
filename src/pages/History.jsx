@@ -25,9 +25,12 @@ const addDays = (dateStr, days) => {
 const formatDateToDisplay = (dateStr) => {
   const [year, month, day] = dateStr.split('-');
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+  const d = new Date(dateStr);
   return {
     month: months[parseInt(month) - 1],
-    day: parseInt(day)
+    day: parseInt(day),
+    weekday: days[d.getDay()]
   };
 };
 
@@ -184,26 +187,35 @@ const History = () => {
       <div style={{ 
         width: '100vw', 
         marginLeft: 'calc(-50vw + 50%)', 
-        background: 'repeating-linear-gradient(45deg, #0f0f13, #0f0f13 10px, #1a1a24 10px, #1a1a24 20px)',
-        padding: '3rem 0',
-        borderTop: '4px solid var(--accent-primary)',
-        borderBottom: '4px solid var(--accent-primary)',
-        boxShadow: 'inset 0 0 50px rgba(0,0,0,0.8)',
-        marginBottom: '3rem'
+        backgroundImage: 'url("/p5-calendar-bg.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        padding: '5rem 0',
+        borderTop: '5px solid #000',
+        borderBottom: '5px solid #000',
+        boxShadow: 'inset 0 0 100px rgba(0,0,0,1)',
+        marginBottom: '3rem',
+        position: 'relative'
       }}>
+        {/* Dark overlay for readability */}
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 0 }} />
+
         <div 
           ref={carouselRef}
           style={{ 
             display: 'flex', 
             gap: '1rem', 
             overflowX: 'auto', 
-            padding: '1rem 50vw 1rem 2rem', 
+            padding: '2rem 50vw 2rem 2rem', 
             scrollbarWidth: 'none', 
-            msOverflowStyle: 'none' 
+            msOverflowStyle: 'none',
+            position: 'relative',
+            zIndex: 1,
+            alignItems: 'center'
           }}
           className="no-scrollbar"
         >
-          {timeline.map((dateStr) => {
+          {timeline.map((dateStr, index) => {
             const isToday = dateStr === todayStr;
             const isDeadline = dateStr === DEADLINE_DATE;
             const isPast = dateStr < todayStr;
@@ -212,22 +224,25 @@ const History = () => {
             const displayDate = formatDateToDisplay(dateStr);
 
             // Persona visual logic
-            let bg = '#121217';
-            let color = 'white';
-            let transform = 'skewX(-10deg)';
-            let borderColor = '#333';
+            let bg = 'white';
+            let color = 'black';
+            let dateColor = 'black';
+            let transform = `skewX(-10deg) translateY(${index % 2 === 0 ? '-15px' : '15px'}) rotate(${index % 2 === 0 ? '-2deg' : '2deg'})`;
+            let outline = '3px solid #000';
 
             if (isDeadline) {
-              bg = 'var(--error)';
+              bg = '#fff';
               color = '#000';
-              transform = 'skewX(-10deg) scale(1.1)';
-              borderColor = '#000';
-            } else if (isSelected) {
-              bg = 'white';
-              color = '#000';
-              borderColor = 'var(--accent-primary)';
-            } else if (hasTests) {
-              borderColor = 'var(--accent-primary)';
+              dateColor = 'var(--error)'; // Red number for deadline
+              transform = `skewX(-12deg) scale(1.3) translateY(${index % 2 === 0 ? '-15px' : '15px'}) rotate(-5deg)`;
+              outline = '4px solid #000';
+            } else if (isToday) {
+              dateColor = '#4cc9f0'; // Blue for today like in the screenshot
+              transform = `skewX(-10deg) scale(1.2) translateY(${index % 2 === 0 ? '-15px' : '15px'})`;
+              outline = '4px solid #000';
+            } else if (isPast) {
+              bg = '#ddd'; // Grayish out past
+              dateColor = '#333';
             }
 
             return (
@@ -237,12 +252,13 @@ const History = () => {
                 onClick={() => setSelectedDate(dateStr)}
                 style={{ 
                   flexShrink: 0,
-                  width: isDeadline ? '160px' : '100px',
+                  width: isDeadline ? '180px' : (isToday ? '160px' : '130px'),
                   height: '140px',
                   background: bg,
                   color: color,
                   transform: transform,
-                  border: `3px solid ${borderColor}`,
+                  boxShadow: '8px 8px 0px rgba(0,0,0,1)',
+                  border: outline,
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
@@ -250,37 +266,59 @@ const History = () => {
                   cursor: 'pointer',
                   position: 'relative',
                   transition: 'all 0.2s ease',
-                  boxShadow: isSelected ? '0 0 20px rgba(255,255,255,0.3)' : (isDeadline ? '0 0 30px rgba(217, 15, 35, 0.5)' : '5px 5px 0 rgba(0,0,0,0.5)'),
-                  opacity: (isPast && !hasTests && !isSelected) ? 0.4 : 1
+                  opacity: (isPast && !hasTests && !isSelected) ? 0.6 : 1,
+                  zIndex: isSelected ? 10 : (isToday || isDeadline ? 5 : 1)
                 }}
               >
-                {/* Red Cross for Past Days */}
-                {isPast && !isSelected && !isDeadline && (
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-                    <X size={80} color="rgba(217, 15, 35, 0.4)" strokeWidth={1} />
+                {/* Sword for TODAY */}
+                {isToday && (
+                  <div style={{ position: 'absolute', top: '-60px', right: '-40px', transform: 'rotate(45deg)', zIndex: 10, filter: 'drop-shadow(5px 5px 0px rgba(0,0,0,1))' }}>
+                    <svg width="100" height="100" viewBox="0 0 24 24" fill="white" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14.5 17.5L3 6V3h3l11.5 11.5" />
+                      <path d="M13 19l6-6" />
+                      <path d="M16 16l4 4" />
+                      <path d="M19 21l2-2" />
+                      <path d="M14.5 14.5L18 11" />
+                      <path d="M10 10l-4 4" />
+                    </svg>
                   </div>
                 )}
 
                 {/* Has Tests Indicator */}
                 {hasTests && !isSelected && !isDeadline && (
-                  <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: 'var(--accent-primary)', width: '20px', height: '20px', borderRadius: '50%', border: '2px solid #000' }} />
-                )}
-
-                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                  {displayDate.month}
-                </div>
-                <div style={{ fontSize: isDeadline ? '4rem' : '3.5rem', fontWeight: '900', lineHeight: '1', textShadow: isSelected ? 'none' : '2px 2px 0 rgba(0,0,0,0.5)' }}>
-                  {displayDate.day}
-                </div>
-                
-                {isToday && !isSelected && !isDeadline && (
-                  <div style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', fontWeight: 'bold', marginTop: '0.5rem' }}>TODAY</div>
-                )}
-
-                {isDeadline && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.5rem', color: '#000', fontWeight: '900' }}>
-                    <Skull size={16} /> DEADLINE
+                  <div style={{ position: 'absolute', top: '-15px', right: '-15px', background: 'var(--accent-primary)', width: '30px', height: '30px', borderRadius: '50%', border: '3px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: '900', fontSize: '1rem', transform: 'rotate(15deg)' }}>
+                    !
                   </div>
+                )}
+
+                {/* Date Content */}
+                <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                  <div style={{ fontSize: '1rem', fontWeight: '900', color: '#000', marginBottom: '-10px', textShadow: '1px 1px 0 #fff' }}>
+                    {displayDate.month}
+                  </div>
+                  
+                  <div style={{ fontSize: isDeadline ? '5.5rem' : (isToday ? '5rem' : '4rem'), fontWeight: '900', lineHeight: '1', color: dateColor, letterSpacing: '-2px', textShadow: '2px 2px 0px #000, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}>
+                    {displayDate.day}
+                  </div>
+                  
+                  <div style={{ 
+                    background: '#000', 
+                    color: '#fff', 
+                    width: '100%', 
+                    textAlign: 'center', 
+                    padding: '0.2rem 0', 
+                    marginTop: '0.5rem',
+                    fontSize: '0.9rem',
+                    fontWeight: 'bold',
+                    letterSpacing: '1px'
+                  }}>
+                    {displayDate.weekday}
+                  </div>
+                </div>
+
+                {/* Selected Overlay */}
+                {isSelected && (
+                  <div style={{ position: 'absolute', inset: 0, border: '6px solid var(--accent-primary)', pointerEvents: 'none', zIndex: 5 }} />
                 )}
               </div>
             );
