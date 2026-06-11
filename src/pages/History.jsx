@@ -192,7 +192,7 @@ const History = () => {
         backgroundImage: `url(${calendarBg})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        padding: '5rem 0',
+        padding: '7rem 0 5rem 0',
         borderTop: '5px solid #000',
         borderBottom: '5px solid #000',
         boxShadow: 'inset 0 0 100px rgba(0,0,0,1)',
@@ -275,8 +275,8 @@ const History = () => {
               >
                 {/* Sword for TODAY */}
                 {isToday && (
-                  <div style={{ position: 'absolute', top: '-110px', right: '-80px', transform: 'rotate(-10deg)', zIndex: 10, pointerEvents: 'none', filter: 'drop-shadow(10px 10px 5px rgba(0,0,0,0.8))' }}>
-                    <img src={daggerImg} alt="Dagger" style={{ width: '150px', height: 'auto', objectFit: 'contain' }} />
+                  <div style={{ position: 'absolute', top: '-100px', right: '-70px', transform: 'rotate(-10deg)', zIndex: 10, pointerEvents: 'none', filter: 'drop-shadow(8px 8px 0px rgba(0,0,0,0.8))' }}>
+                    <img src={daggerImg} alt="Dagger" style={{ width: '130px', height: 'auto', objectFit: 'contain' }} />
                   </div>
                 )}
 
