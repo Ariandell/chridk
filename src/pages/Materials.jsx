@@ -68,7 +68,8 @@ const Materials = () => {
                 justifyContent: 'flex-start',
                 whiteSpace: 'normal',
                 height: 'auto',
-                lineHeight: '1.4'
+                lineHeight: '1.4',
+                flexShrink: 0
               }}
               onClick={() => setSelectedTopicId(topic.id)}
             >
