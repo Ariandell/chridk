@@ -77,7 +77,6 @@ const Exam = () => {
   const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? (data ? (data.durationMinutes || 150) * 60 : 0));
   const [isFinished, setIsFinished] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [pauseTimeLeft, setPauseTimeLeft] = useState(300); // 5 minutes max pause
   const [expandedOptions, setExpandedOptions] = useState({}); // { optionId: boolean }
   const [portalTarget, setPortalTarget] = useState(null);
   const [translationContext, setTranslationContext] = useState(null);
@@ -124,13 +123,6 @@ const Exam = () => {
       lastTickTime.current = now;
 
       if (isPaused) {
-        setPauseTimeLeft((prev) => {
-          if (prev - deltaSecs <= 0) {
-            setIsPaused(false); // Auto unpause
-            return 300;
-          }
-          return prev - deltaSecs;
-        });
         return;
       }
 
@@ -252,15 +244,11 @@ const Exam = () => {
     if (window.confirm('Ви впевнені, що хочете скинути таймер на початок?')) {
       setTimeLeft((data.durationMinutes || 150) * 60);
       setIsPaused(false);
-      setPauseTimeLeft(300);
     }
   };
 
   const togglePause = () => {
     setIsPaused(!isPaused);
-    if (isPaused) {
-      setPauseTimeLeft(300); // Reset pause timer when unpausing
-    }
   };
 
   const formatTime = (seconds) => {
@@ -298,15 +286,15 @@ const Exam = () => {
             subjectId={subjectId} 
           />
           {isPaused && (
-            <div style={{ color: 'var(--accent-yellow)', fontWeight: 'bold', fontSize: '0.9rem' }}>
-              ПАУЗА: {formatTime(pauseTimeLeft)}
+            <div style={{ color: 'var(--accent-primary)', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' }}>
+              ЗАМОРОЖЕНО
             </div>
           )}
           <div className={`timer ${timeLeft < 300 ? 'warning' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isPaused ? 0.5 : 1, fontSize: '1.1rem', fontWeight: '900', color: 'var(--text-primary)' }}>
             <Clock size={18} />
             {formatTime(timeLeft)}
           </div>
-          <button className="btn btn-secondary" onClick={togglePause} title={isPaused ? "Продовжити" : "Пауза (до 5 хв)"} style={{ padding: '0.4rem' }}>
+          <button className="btn btn-secondary" onClick={togglePause} title={isPaused ? "Розморозити" : "Заморозити час"} style={{ padding: '0.4rem' }}>
             {isPaused ? <Play size={16} /> : <Pause size={16} />}
           </button>
           <button className="btn btn-secondary" onClick={handleResetTimer} title="Скинути таймер" style={{ padding: '0.4rem' }}>
@@ -318,10 +306,9 @@ const Exam = () => {
 
       <div className="question-container glass-panel" style={{ position: 'relative' }}>
         {isPaused && (
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', clipPath: 'polygon(0 0, 100% 2%, 98% 100%, 2% 98%)' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', clipPath: 'polygon(0 0, 100% 2%, 98% 100%, 2% 98%)' }}>
             <Pause size={64} style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }} />
-            <h2 style={{ marginBottom: '1rem', color: 'var(--accent-primary)', fontSize: '2.5rem' }}>PAUSED</h2>
-            <p style={{ marginBottom: '2rem', fontWeight: 'bold', fontSize: '1.2rem' }}>Часу залишилось: {formatTime(pauseTimeLeft)}</p>
+            <h2 style={{ marginBottom: '2rem', color: 'var(--accent-primary)', fontSize: '2.5rem', textTransform: 'uppercase' }}>ЗАМОРОЖЕНО</h2>
             <button className="btn btn-primary" onClick={togglePause}>
               <Play size={18} /> RESUME
             </button>
@@ -348,7 +335,7 @@ const Exam = () => {
             return (
               <div 
                 key={q.id}
-                onClick={() => setCurrentQuestionIdx(idx)}
+                onClick={() => !isPaused && setCurrentQuestionIdx(idx)}
                 className={`tracker-item ${statusClass}`}
                 style={{
                   width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center',
