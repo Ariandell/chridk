@@ -23,19 +23,39 @@ const materialsPath = path.join(__dirname, '../src/data/materials.json');
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 async function fetchMaterial(topic) {
-  const prompt = `Ти топовий експерт з інформаційних технологій. 
-Твоя мета - підготувати детальну, якісну, і легко читабельну шпаргалку / навчальний матеріал для студентів, які готуються до Єдиного Фахового Вступного Випробування (ЄФВВ) за темою: "${topic.title}".
+  const prompt = `Ти викладач-ментор з ІТ. Твоя мета - підготувати матеріали для підготовки до ЄФВВ за темою: "${topic.title}".
 
 Опис теми: "${topic.description}"
 
-Вимоги:
-1. Матеріал має бути структурований у форматі Markdown.
-2. Використовуй заголовки (##, ###), списки, жирний шрифт для виділення головного.
-3. Пояснюй ключові поняття, алгоритми, технології, формули. Якщо доречно, використовуй LaTeX математику всередині $...$ або $$...$$.
-4. Матеріал має бути вичерпним, але без зайвої "води". Фокус на суті, яка потрібна для здачі тесту.
-5. Об'єм: 1500-3000 слів.
+Вимоги до формату:
+Тобі потрібно розбити тему на 2-4 логічні БЛОКИ (мікронавчання).
+Після кожного блоку потрібно додати 3-5 тестових питань у форматі ЄФВВ (з 4 варіантами А, Б, В, Г).
+Кожен блок повинен містити коротку, але вичерпну теорію (Markdown), таблиці порівнянь, життєві аналогії. Ніякої зайвої "води".
 
-Поверни ТІЛЬКИ текст у форматі Markdown, без додаткових пояснень або блоків коду навколо нього. Почни одразу із заголовка # ${topic.title}`;
+УВАГА! Поверни результат СУВОРО у форматі JSON у такому вигляді:
+{
+  "blocks": [
+    {
+      "title": "1. Назва блоку",
+      "content": "Текст теорії у форматі Markdown (короткі абзаци, списки, $latex$)...",
+      "tests": [
+        {
+          "question": "Текст питання?",
+          "options": [
+            {"id": "А", "text": "Варіант 1"},
+            {"id": "Б", "text": "Варіант 2"},
+            {"id": "В", "text": "Варіант 3"},
+            {"id": "Г", "text": "Варіант 4"}
+          ],
+          "answer": "А",
+          "explanation": "Коротке пояснення, чому саме ця відповідь правильна."
+        }
+      ]
+    }
+  ]
+}
+
+Повертай ТІЛЬКИ валідний JSON без зайвого тексту чи markdown блоків навколо нього.`;
 
   try {
     console.log(`\n==================== Thinking Process for ${topic.title} ====================`);
@@ -43,10 +63,10 @@ async function fetchMaterial(topic) {
     const stream = await client.chat.completions.create({
       model: MODEL_NAME,
       messages: [
-        { role: "system", content: "Ти корисний AI-асистент, який пише професійні навчальні матеріали у Markdown." },
+        { role: "system", content: "Ти корисний AI-асистент, який повертає валідний JSON." },
         { role: "user", content: prompt }
       ],
-      temperature: 0.2,
+      temperature: 0.1,
       stream: true,
     });
 
@@ -66,7 +86,7 @@ async function fetchMaterial(topic) {
       
       if (delta.content) {
         if (!isAnswering) {
-          console.log(`\n==================== Generating Markdown ====================`);
+          console.log(`\n==================== Generating JSON ====================`);
           isAnswering = true;
         }
         process.stdout.write(delta.content);
@@ -75,9 +95,23 @@ async function fetchMaterial(topic) {
     }
     
     console.log("\n"); 
-    return fullResponse;
+
+    let jsonStr = fullResponse;
+    const jsonMatch = fullResponse.match(/```json\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[1];
+    } else {
+      const start = fullResponse.indexOf('{');
+      const end = fullResponse.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        jsonStr = fullResponse.substring(start, end + 1);
+      }
+    }
+
+    const parsed = JSON.parse(jsonStr);
+    return parsed.blocks;
   } catch (error) {
-    console.error("API Error:", error.message);
+    console.error("API Error or JSON Parsing Error:", error.message);
     return null;
   }
 }
@@ -95,7 +129,7 @@ async function main() {
     materials = JSON.parse(fs.readFileSync(materialsPath, 'utf8'));
   }
 
-  const remainingTopics = topics.filter(t => !materials.some(m => m.id === t.id && m.content.length > 100));
+  const remainingTopics = topics.filter(t => !materials.some(m => m.id === t.id && m.blocks && m.blocks.length > 0));
 
   console.log(`Всього тем: ${topics.length}. Залишилось згенерувати: ${remainingTopics.length}`);
 
@@ -114,16 +148,10 @@ async function main() {
     }
     
     if (content) {
-      // Remove generic markdown block quotes if they exist
-      let cleanContent = content;
-      if (cleanContent.startsWith('\`\`\`markdown')) {
-        cleanContent = cleanContent.replace(/^\`\`\`markdown\n?/, '').replace(/\n?\`\`\`$/, '');
-      }
-
       materials.push({
         id: topic.id,
         title: topic.title,
-        content: cleanContent
+        blocks: content
       });
       fs.writeFileSync(materialsPath, JSON.stringify(materials, null, 2), 'utf8');
       console.log(`[+] Збережено.`);
