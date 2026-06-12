@@ -160,24 +160,23 @@ const History = () => {
                     <span>{new Date(entry.date).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', textAlign: 'right' }}>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '2.5rem', fontWeight: '900', color: scoreColor, textShadow: `2px 2px 0 #000` }}>
-                      {entry.score} / {entry.totalQuestions}
-                    </div>
-                    <div style={{ color: scoreColor, fontWeight: 'bold', fontSize: '1.1rem', textTransform: 'uppercase' }}>{percentage}% Правильно</div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '2.5rem', fontWeight: '900', color: scoreColor, textShadow: `2px 2px 0 #000`, whiteSpace: 'nowrap' }}>
+                    {entry.score} / {entry.totalQuestions}
                   </div>
-                  <button 
-                    onClick={() => handleDeleteEntry(entry.id)}
-                    style={{ background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', opacity: 0.8 }}
-                    title="Видалити запис"
-                    onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                    onMouseOut={(e) => e.currentTarget.style.opacity = 0.8}
-                  >
-                    <Trash2 size={24} />
-                  </button>
+                  <div style={{ color: scoreColor, fontWeight: 'bold', fontSize: '1.1rem', textTransform: 'uppercase' }}>{percentage}% Правильно</div>
                 </div>
               </div>
+              
+              <button 
+                onClick={() => handleDeleteEntry(entry.id)}
+                style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', opacity: 0.6, zIndex: 5 }}
+                title="Видалити запис"
+                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                onMouseOut={(e) => e.currentTarget.style.opacity = 0.6}
+              >
+                <Trash2 size={20} />
+              </button>
             </div>
           );
         })}

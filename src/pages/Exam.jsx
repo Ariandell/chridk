@@ -297,7 +297,7 @@ const Exam = () => {
               ЗАМОРОЖЕНО
             </div>
           )}
-          <div className={`timer ${timeLeft < 300 ? 'warning' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isPaused ? 0.5 : 1, fontSize: '1.1rem', fontWeight: '900', color: 'var(--text-primary)' }}>
+          <div className={`timer ${timeLeft < 300 ? 'warning' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isPaused ? 0.5 : 1, fontSize: '1.1rem', fontWeight: '900', color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', minWidth: '85px', justifyContent: 'center' }}>
             <Clock size={18} />
             {formatTime(timeLeft)}
           </div>
