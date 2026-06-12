@@ -56,9 +56,9 @@ const UserMenu = () => {
     return (
       <div className="user-menu-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
         {isSyncing && <div style={{ width: '14px', height: '14px', border: '2px solid var(--accent-primary)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} title="Синхронізація..." />}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
+        <div className="clip-diagonal" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', padding: '0.4rem 0.8rem', border: '2px solid var(--border-color)' }}>
           {user.photoURL ? (
-            <img src={user.photoURL} alt="Avatar" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+            <img src={user.photoURL} alt="Avatar" className="clip-badge" style={{ width: '24px', height: '24px' }} />
           ) : (
             <User size={24} />
           )}
@@ -75,8 +75,8 @@ const UserMenu = () => {
     <div className="google-login-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
       <button 
         onClick={handleLogin} 
-        className="btn btn-primary" 
-        style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        className="btn btn-primary clip-diagonal" 
+        style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         disabled={isSyncing}
       >
         <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">

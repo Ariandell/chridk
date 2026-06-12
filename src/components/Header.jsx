@@ -14,14 +14,7 @@ const Header = () => {
 
   return (
     <div style={{ position: 'sticky', top: '0', zIndex: 100, marginBottom: '2rem' }}>
-      <header className="app-header persona-header" style={{ 
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-        padding: '1rem 2rem', 
-        background: '#0f0f14', // Very dark
-        borderBottom: '5px solid var(--accent-primary)',
-        clipPath: 'polygon(0 0, 100% 0, 100% 85%, 98% 100%, 70% 90%, 50% 100%, 30% 90%, 2% 100%, 0 85%)',
-        position: 'relative'
-      }}>
+      <header className="app-header">
         {/* Background diagonal stripes effect */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -42,7 +35,7 @@ const Header = () => {
         <div id="header-portal-target" style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: 'auto', transform: 'rotate(1deg)' }}>
           {/* Exam controls will portal here */}
           {streak > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#ff6b6b', fontWeight: 'bold', fontSize: '1.1rem', background: 'rgba(217, 15, 35, 0.1)', padding: '0.3rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(217, 15, 35, 0.3)' }}>
+            <div className="clip-diagonal" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#ff6b6b', fontWeight: 'bold', fontSize: '1.1rem', background: 'rgba(217, 15, 35, 0.1)', padding: '0.3rem 0.8rem', border: '2px solid rgba(217, 15, 35, 0.3)' }}>
               <Flame size={18} color="#ff6b6b" /> {streak}
             </div>
           )}

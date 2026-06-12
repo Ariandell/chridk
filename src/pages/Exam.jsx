@@ -36,13 +36,13 @@ const renderTextWithLinks = (text) => {
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
             padding: '0.2rem 0.6rem', margin: '0 0.2rem',
-            background: 'var(--bg-glass-hover)', color: 'var(--accent-primary)',
-            border: '2px solid var(--accent-primary)', borderRadius: '20px',
+            background: 'var(--bg-secondary)', color: 'var(--accent-primary)',
+            border: '2px solid var(--accent-primary)',
             fontWeight: 'bold', fontSize: '0.85rem', textDecoration: 'none',
             verticalAlign: 'middle', transition: 'all 0.2s ease'
           }}
           onMouseOver={(e) => { e.currentTarget.style.background = 'var(--accent-primary)'; e.currentTarget.style.color = '#fff'; }}
-          onMouseOut={(e) => { e.currentTarget.style.background = 'var(--bg-glass-hover)'; e.currentTarget.style.color = 'var(--accent-primary)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.background = 'var(--bg-secondary)'; e.currentTarget.style.color = 'var(--accent-primary)'; }}
         >
           <ExternalLink size={14} /> ПОСИЛАННЯ
         </a>
@@ -341,14 +341,14 @@ const Exam = () => {
         {!answers[currentQuestion.id] && germanHints && germanHints[currentQuestion.id] && (
           <div style={{ marginBottom: '1rem' }}>
             <button 
-              className="btn btn-secondary"
+              className="btn btn-secondary clip-diagonal"
               onClick={() => setShowHint(!showHint)}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                fontSize: '0.85rem', padding: '0.3rem 0.8rem', borderRadius: '20px',
-                background: showHint ? 'var(--accent-primary)' : 'var(--bg-glass-hover)',
+                fontSize: '0.85rem', padding: '0.3rem 0.8rem',
+                background: showHint ? 'var(--accent-primary)' : 'var(--bg-secondary)',
                 color: showHint ? '#fff' : 'var(--accent-primary)',
-                border: '1px solid var(--accent-primary)',
+                border: '2px solid var(--accent-primary)',
                 transition: 'all 0.2s ease'
               }}
             >
@@ -356,9 +356,9 @@ const Exam = () => {
             </button>
             
             {showHint && (
-              <div style={{
-                marginTop: '0.5rem', padding: '0.8rem', background: 'var(--bg-primary)',
-                borderLeft: '4px solid var(--accent-primary)', borderRadius: '4px',
+              <div className="clip-sharp" style={{
+                marginTop: '0.5rem', padding: '0.8rem', background: 'var(--bg-secondary)',
+                borderLeft: '4px solid var(--accent-primary)',
                 fontSize: '0.95rem', animation: 'fadeIn 0.2s ease'
               }}>
                 <div style={{ marginBottom: '0.5rem', fontWeight: '500' }}>
@@ -476,11 +476,10 @@ const Exam = () => {
                   {isAnswered && questionHasExps && (
                     <div 
                       onClick={(e) => { e.stopPropagation(); toggleExpansion(option.id); }}
-                      style={{
-                        marginLeft: 'auto', marginRight: '0.5rem', width: '28px', height: '28px', 
-                        borderRadius: '50%', border: '2px solid currentColor', display: 'flex', 
-                        alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px',
-                        cursor: 'pointer', flexShrink: 0, opacity: 0.9
+                      className="clip-badge" style={{
+                        width: '24px', height: '24px', display: 'flex', 
+                        alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 'bold', fontSize: '14px',
+                        cursor: 'pointer', opacity: 0.9
                       }}
                       title="Показати пояснення"
                     >

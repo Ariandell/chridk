@@ -10,7 +10,13 @@ const pushToCloud = async (historyData, dailiesData) => {
   if (!user) return;
   try {
     const userRef = doc(db, 'users', user.uid);
-    await setDoc(userRef, { history: historyData, dailies: dailiesData }, { merge: true });
+    const profile = {
+      email: user.email || '',
+      displayName: user.displayName || user.email?.split('@')[0] || 'Unknown',
+      photoURL: user.photoURL || '',
+      lastSync: new Date().toISOString()
+    };
+    await setDoc(userRef, { profile, history: historyData, dailies: dailiesData }, { merge: true });
   } catch (err) {
     console.error('Background sync failed:', err);
   }

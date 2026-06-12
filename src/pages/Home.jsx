@@ -59,9 +59,9 @@ const Home = () => {
           {/* Persona-style background accent */}
           <div style={{ position: 'absolute', top: '-10px', left: '-10px', right: '10px', bottom: '10px', background: 'var(--accent-primary)', clipPath: 'polygon(2% 0, 100% 4%, 98% 100%, 0 96%)', zIndex: 0 }} />
           
-          <div style={{ position: 'relative', zIndex: 1, background: '#121217', padding: '2rem', clipPath: 'polygon(0 0, 100% 2%, 99% 100%, 1% 98%)', border: '2px solid var(--text-primary)' }}>
+          <div className="persona-card" style={{ padding: '2rem', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '2rem' }}>
-              <div style={{ background: 'var(--accent-primary)', padding: '0.5rem', clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(-10deg)' }}>
+              <div className="clip-badge" style={{ background: 'var(--accent-primary)', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(-10deg)' }}>
                 <Target size={28} color="#000" />
               </div>
               <h2 style={{ fontSize: '2rem', margin: 0, textTransform: 'uppercase', fontWeight: '900', letterSpacing: '2px', textShadow: '2px 2px 0 var(--accent-primary)', transform: 'rotate(-2deg)' }}>Щоденні Завдання</h2>
@@ -69,13 +69,11 @@ const Home = () => {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               {dailies.quests.map((quest) => (
-                <div key={quest.id} style={{ 
-                  background: quest.completed ? 'rgba(6, 214, 160, 0.1)' : 'var(--bg-secondary)', 
+                <div key={quest.id} className="persona-card" style={{ 
+                  background: quest.completed ? 'var(--success-bg)' : 'var(--bg-secondary)', 
                   padding: '1.2rem', 
                   border: `2px solid ${quest.completed ? 'var(--success)' : 'var(--border-color)'}`, 
-                  display: 'flex', alignItems: 'center', gap: '1rem',
-                  clipPath: 'polygon(0 0, 100% 0, 99% 100%, 1% 100%)',
-                  transition: 'all 0.3s ease'
+                  display: 'flex', alignItems: 'center', gap: '1rem'
                 }}>
                   <div style={{ fontSize: '2rem', filter: quest.completed ? 'none' : 'grayscale(100%)', opacity: quest.completed ? 1 : 0.7 }}>
                     {quest.icon || '🎯'}
@@ -87,7 +85,7 @@ const Home = () => {
                     </h4>
                     
                     {!quest.completed && (
-                      <div style={{ background: 'var(--bg-primary)', height: '14px', borderRadius: '0', overflow: 'hidden', border: '1px solid var(--border-color)', transform: 'skewX(-15deg)' }}>
+                      <div className="clip-sharp" style={{ background: 'var(--bg-primary)', height: '14px', border: '1px solid var(--border-color)', transform: 'skewX(-15deg)' }}>
                         <div style={{ 
                           width: `${Math.min(100, (quest.progress / quest.target) * 100)}%`, 
                           height: '100%', 

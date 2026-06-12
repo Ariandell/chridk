@@ -125,12 +125,9 @@ const History = () => {
           else if (percentage >= 50) scoreColor = 'var(--accent-yellow)';
 
           return (
-            <div key={entry.id} style={{ 
-              background: 'var(--bg-secondary)', 
+            <div key={entry.id} className="persona-card" style={{ 
               padding: '1.5rem',
-              clipPath: 'polygon(1% 0, 100% 0, 99% 100%, 0 100%)',
-              borderLeft: `6px solid ${scoreColor}`,
-              position: 'relative'
+              borderLeft: `6px solid ${scoreColor}`
             }}>
               {percentage >= 90 && (
                 <div style={{ position: 'absolute', top: '10px', right: '10px', color: 'var(--success)', transform: 'rotate(15deg)', opacity: 0.2 }}>
@@ -142,7 +139,7 @@ const History = () => {
                 <div>
                   <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-primary)', fontSize: '1.4rem' }}>{entry.title}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 'bold' }}>
-                    <span style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', background: 'rgba(217, 15, 35, 0.1)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
+                    <span className="clip-diagonal" style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', background: 'rgba(217, 15, 35, 0.1)', padding: '0.2rem 0.6rem' }}>
                       {entry.subjectId}
                     </span>
                     <span>{new Date(entry.date).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -282,7 +279,7 @@ const History = () => {
 
                 {/* Has Tests Indicator */}
                 {hasTests && !isSelected && !isDeadline && (
-                  <div style={{ position: 'absolute', top: '-15px', right: '-15px', background: 'var(--accent-primary)', width: '30px', height: '30px', borderRadius: '50%', border: '3px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: '900', fontSize: '1rem', transform: 'rotate(15deg)' }}>
+                  <div className="clip-badge" style={{ position: 'absolute', top: '-15px', right: '-15px', background: 'var(--accent-primary)', width: '30px', height: '30px', border: '3px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: '900', fontSize: '1rem', transform: 'rotate(15deg)' }}>
                     !
                   </div>
                 )}

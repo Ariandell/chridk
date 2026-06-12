@@ -42,7 +42,7 @@ const Subject = () => {
 
       {hasLargeTest && (
         <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: 'var(--bg-glass)', padding: '0.5rem 1rem', borderRadius: '8px', border: '2px solid var(--border-color)' }}>
+          <label className="clip-diagonal" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: 'var(--bg-secondary)', padding: '0.5rem 1rem', border: '2px solid var(--border-color)' }}>
             <input 
               type="checkbox" 
               checked={isBlockMode} 
@@ -56,7 +56,7 @@ const Subject = () => {
 
       <div className="subjects-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))' }}>
         {displaySessions && displaySessions.map((session) => (
-          <div key={session.id} className="subject-card glass-panel" style={{ padding: '1.5rem' }}>
+          <div key={session.id} className="subject-card persona-card" style={{ padding: '1.5rem' }}>
             <h3 style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>{session.title}</h3>
             
             <div className="subject-meta" style={{ marginBottom: '1.5rem' }}>

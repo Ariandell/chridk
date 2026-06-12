@@ -89,7 +89,7 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
     <>
       {/* Header Button */}
       <button 
-        className="btn btn-primary"
+        className="btn btn-primary clip-diagonal"
         onClick={() => setIsOpen(true)}
         style={{ display: isOpen ? 'none' : 'flex', padding: '0.5rem 1rem', gap: '0.5rem', background: 'var(--accent-secondary)', borderColor: 'var(--accent-secondary)' }}
       >
@@ -121,18 +121,17 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
                 display: 'flex', flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
                 alignItems: 'flex-start', gap: '0.5rem'
               }}>
-                <div style={{
-                  width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                <div className="clip-badge" style={{
+                  width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: msg.role === 'user' ? 'var(--text-primary)' : 'var(--accent-primary)',
                   color: msg.role === 'user' ? 'var(--bg-primary)' : 'white', flexShrink: 0
                 }}>
                   {msg.role === 'user' ? <User size={18} /> : <Bot size={18} />}
                 </div>
-                <div style={{
+                <div className="clip-diagonal" style={{
                   background: msg.role === 'user' ? 'var(--text-primary)' : 'var(--bg-secondary)',
                   color: msg.role === 'user' ? 'var(--bg-primary)' : 'var(--text-primary)',
                   padding: '0.75rem', border: '2px solid', borderColor: msg.role === 'user' ? 'var(--text-primary)' : 'var(--accent-primary)',
-                  borderRadius: msg.role === 'user' ? '12px 0 12px 12px' : '0 12px 12px 12px',
                   maxWidth: '80%', fontSize: '0.9rem', fontWeight: '600', whiteSpace: 'pre-wrap'
                 }}>
                   {msg.text}
