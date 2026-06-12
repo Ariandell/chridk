@@ -5,15 +5,15 @@
   },
   "632_16": {
     "text": "Пасивний стан (Passiv): «wird viel Brot gegessen» (їдять багато хліба). Дієслово werden + Partizip II.",
-    "link": "https://mein-deutschbuch.de/passiv.html"
+    "link": "https://mein-deutschbuch.de/passiv-formen.html"
   },
   "632_22": {
     "text": "Дієслово helfen вимагає прийменника bei + Dativ: «beim Kauf helfen» (допомагати при покупці).",
-    "link": "https://mein-deutschbuch.de/dativ.html"
+    "link": "https://mein-deutschbuch.de/dativ-ergaenzung.html"
   },
   "632_24": {
     "text": "Пасивний стан у минулому часі (Präteritum Passiv): «wurden nicht mehr Elektroautos verkauft» (не було продано більше електроавтомобілів). Множина, тому wurden.",
-    "link": "https://mein-deutschbuch.de/passiv-praeteritum.html"
+    "link": "https://mein-deutschbuch.de/vorgangspassiv.html"
   },
   "632_28": {
     "text": "Модальне дієслово (muss) вимагає інфінітива в кінці речення: «aufladen» (заряджати).",
@@ -21,11 +21,11 @@
   },
   "632_30": {
     "text": "Відносний займенник (Relativpronomen) у давальному відмінку множини (Dativ Plural): «an denen» (на яких).",
-    "link": "https://mein-deutschbuch.de/relativpronomen.html"
+    "link": "https://mein-deutschbuch.de/nebensaetze.html"
   },
   "537_15": {
     "text": "Більшість німців: «Die meisten Deutschen».",
-    "link": "https://mein-deutschbuch.de/adjektivdeklination.html"
+    "link": "https://mein-deutschbuch.de/adjektive.html"
   },
   "537_22": {
     "text": "Родовий відмінок множини (Genitiv Plural) від die Einwohner. «30 Prozent der Einwohner» (30 відсотків жителів). Детальніше про Genitiv: https://mein-deutschbuch.de/genitiv.html",
@@ -49,7 +49,7 @@
   },
   "537_27": {
     "text": "Теперішній час (Präsens) від дієслова sehen для третьої особи однини (man): «man sieht» (можна побачити).",
-    "link": "https://mein-deutschbuch.de/praesens.html"
+    "link": "https://mein-deutschbuch.de/gegenwart.html"
   },
   "537_29": {
     "text": "Зворотне дієслово «sich weigern» (відмовлятися). Для множини (Viele von ihnen) використовується зворотний займенник «sich».",
@@ -57,7 +57,7 @@
   },
   "512_15": {
     "text": "Більшість німців: «Die meisten Deutschen».",
-    "link": "https://mein-deutschbuch.de/adjektivdeklination.html"
+    "link": "https://mein-deutschbuch.de/adjektive.html"
   },
   "512_22": {
     "text": "Родовий відмінок множини (Genitiv Plural) від die Einwohner. «30 Prozent der Einwohner» (30 відсотків жителів). Детальніше про Genitiv: https://mein-deutschbuch.de/genitiv.html",
@@ -81,15 +81,15 @@
   },
   "512_27": {
     "text": "Теперішній час (Präsens) від дієслова sehen для третьої особи однини (man): «man sieht» (можна побачити).",
-    "link": "https://mein-deutschbuch.de/praesens.html"
+    "link": "https://mein-deutschbuch.de/gegenwart.html"
   },
   "512_29": {
     "text": "Зворотне дієслово «sich weigern» (відмовлятися). Для множини (Viele von ihnen) використовується зворотний займенник «sich».",
     "link": "https://mein-deutschbuch.de/reflexive-verben.html"
   },
   "480_29": {
-    "text": "Ціни на бензин стають вищими (höher). Ступінь порівняння прикметників: https://mein-deutschbuch.de/komparation.html",
-    "link": "https://mein-deutschbuch.de/komparation.html"
+    "text": "Ціни на бензин стають вищими (höher). Ступінь порівняння прикметників: https://mein-deutschbuch.de/komparativ-superlativ.html",
+    "link": "https://mein-deutschbuch.de/komparativ-superlativ.html"
   },
   "480_33": {
     "text": "Прийменник часу 'vor' (тому). 'vor sechs Jahren' (шість років тому) вимагає давального відмінка.",
@@ -97,7 +97,7 @@
   },
   "480_34": {
     "text": "Давальний відмінок чоловічого роду (Dativ Maskulinum): 'an einem Schüleraustausch' (в обміні учнями).",
-    "link": "https://mein-deutschbuch.de/dativ.html"
+    "link": "https://mein-deutschbuch.de/dativ-ergaenzung.html"
   },
   "480_35": {
     "text": "Дієслово 'teilnehmen' у формі Partizip II (брав участь): 'hat ... teilgenommen'. Перфект.",
@@ -105,7 +105,7 @@
   },
   "480_37": {
     "text": "Сполучник часу 'als' використовується для одноразових подій у минулому ('коли вона вперше приїхала...').",
-    "link": "https://mein-deutschbuch.de/nebensaetze-als-wenn.html"
+    "link": "https://mein-deutschbuch.de/nebensaetze.html"
   },
   "480_38": {
     "text": "Інфінітив 'gehen' (їхати/йти) стоїть у кінці речення, оскільки на другому місці стоїть модальне дієслово 'wollte' (хотіла). 'ins Ausland gehen' (поїхати за кордон).",
@@ -117,19 +117,19 @@
   },
   "480_40": {
     "text": "Порядковий числівник (Ordinalzahl): 'zum zweiten Mal' (вдруге). Після злиття 'zu + dem' (zum) числівник має закінчення -en.",
-    "link": "https://mein-deutschbuch.de/ordinalzahlen.html"
+    "link": "https://mein-deutschbuch.de/zahlwoerter.html"
   },
   "480_41": {
     "text": "Відносний займенник 'was' (що). Використовується після неозначених займенників, таких як alles: 'das ist alles, was zählt' (це все, що має значення).",
-    "link": "https://mein-deutschbuch.de/relativpronomen.html"
+    "link": "https://mein-deutschbuch.de/nebensaetze.html"
   },
   "480_42": {
     "text": "Ступінь порівняння прикметника (Komparativ): 'noch besser' (ще краще).",
-    "link": "https://mein-deutschbuch.de/komparation.html"
+    "link": "https://mein-deutschbuch.de/komparativ-superlativ.html"
   },
   "404_23": {
     "text": "Перший банкомат був 'встановлений' (wurde ... aufgestellt). Це пасивний стан (Passiv).",
-    "link": "https://mein-deutschbuch.de/passiv.html"
+    "link": "https://mein-deutschbuch.de/passiv-formen.html"
   },
   "404_24": {
     "text": "Щоб отримати готівку, потрібен був спеціальний ключ (um ... zu bekommen). Це інфінітивна конструкція з um...zu.",
@@ -137,7 +137,7 @@
   },
   "404_28": {
     "text": "Органна музика стала 'нематеріальною' культурною спадщиною (zum immateriellen Weltkulturerbe). Відмінювання прикметника після злиття прийменника з артиклем (zu + dem = zum).",
-    "link": "https://mein-deutschbuch.de/adjektivdeklination.html"
+    "link": "https://mein-deutschbuch.de/adjektive.html"
   },
   "404_33": {
     "text": "Дієслово у минулому часі (Präteritum) для множини: 'suchten' (шукали).",
@@ -153,7 +153,7 @@
   },
   "404_36": {
     "text": "Займенниковий прислівник 'dafür' (для цього). Вони потребували для цього металошукач.",
-    "link": "https://mein-deutschbuch.de/pronominaladverbien.html"
+    "link": "https://mein-deutschbuch.de/praepositionalergaenzung.html"
   },
   "404_37": {
     "text": "Минулий час Plusquamperfekt: 'hatten ... mitgenommen' (взяли з собою).",
@@ -165,19 +165,19 @@
   },
   "404_40": {
     "text": "Відносний займенник (Relativpronomen) для множини: 'die' (монети, які...).",
-    "link": "https://mein-deutschbuch.de/relativpronomen.html"
+    "link": "https://mein-deutschbuch.de/nebensaetze.html"
   },
   "404_41": {
     "text": "Wait, it's 364_41. Сполучник сурядності 'denn' (оскільки/тому що). Вводить головне речення з прямим порядком слів.",
-    "link": "https://mein-deutschbuch.de/hauptsaetze.html"
+    "link": "https://mein-deutschbuch.de/satzlehre.html"
   },
   "364_29": {
     "text": "Пасивний стан (Passiv): знання 'здобуваються' (Erkenntnisse werden ... gewonnen).",
-    "link": "https://mein-deutschbuch.de/passiv.html"
+    "link": "https://mein-deutschbuch.de/passiv-formen.html"
   },
   "364_33": {
     "text": "Питальне слово 'woher' (звідки). 'Звідки насправді походять голоси?'",
-    "link": "https://mein-deutschbuch.de/interrogativpronomen.html"
+    "link": "https://mein-deutschbuch.de/interrogativartikel.html"
   },
   "364_34": {
     "text": "Прийменник 'für' (для). Відомий голос 'для' відеоігор.",
@@ -193,7 +193,7 @@
   },
   "364_38": {
     "text": "Відмінювання прикметника: 'in vielen Spielen' (у багатьох іграх). Dativ Plural має закінчення -en.",
-    "link": "https://mein-deutschbuch.de/adjektivdeklination.html"
+    "link": "https://mein-deutschbuch.de/adjektive.html"
   },
   "364_39": {
     "text": "Дієслово teilnehmen (брати участь) у формі Perfekt: 'hat ... teilgenommen'.",
@@ -205,27 +205,27 @@
   },
   "364_41": {
     "text": "Сполучник сурядності 'denn' (оскільки/тому що). Вводить головне речення з прямим порядком слів.",
-    "link": "https://mein-deutschbuch.de/hauptsaetze.html"
+    "link": "https://mein-deutschbuch.de/satzlehre.html"
   },
   "364_42": {
     "text": "Відносний займенник 'denen' у давальному відмінку множини (Dativ Plural): 'Spiele, in denen ...' (Ігри, в яких...).",
-    "link": "https://mein-deutschbuch.de/relativpronomen.html"
+    "link": "https://mein-deutschbuch.de/nebensaetze.html"
   },
   "322_17": {
     "text": "Підрядне речення з 'dass' (що). Манфред радий, 'що в місті так багато відбувається' (dass in der Stadt so viel passiert).",
-    "link": "https://mein-deutschbuch.de/nebensaetze-dass.html"
+    "link": "https://mein-deutschbuch.de/dass-saetze-im-akkusativ.html"
   },
   "322_19": {
     "text": "Відносне підрядне речення, яке пояснює хто така ця дівчина: 'яка вже жила за межами Берліна' (die bereits außerhalb von Berlin gelebt hat).",
-    "link": "https://mein-deutschbuch.de/relativsaetze.html"
+    "link": "https://mein-deutschbuch.de/nebensaetze.html"
   },
   "322_20": {
     "text": "Підрядне речення причини зі сполучником 'weil' (тому що): 'тому що вона більше року прожила в маленькому містечку' (weil sie über ein Jahr in einer Kleinstadt gewohnt hat).",
-    "link": "https://mein-deutschbuch.de/nebensaetze-weil-da.html"
+    "link": "https://mein-deutschbuch.de/nebensaetze.html"
   },
   "322_21": {
     "text": "Підрядне речення: можна робити 'те, що хочеш' (was man will). Відносний займенник 'was'.",
-    "link": "https://mein-deutschbuch.de/relativpronomen.html"
+    "link": "https://mein-deutschbuch.de/nebensaetze.html"
   },
   "322_33": {
     "text": "Зворотне дієслово 'sich interessieren' (цікавитися). Для першої особи однини (Ich) зворотний займенник — 'mich' (interessiere mich).",
@@ -257,7 +257,7 @@
   },
   "322_41": {
     "text": "Підрядний сполучник 'dass' (що). 'Ich hoffe, dass...' (Я сподіваюсь, що...).",
-    "link": "https://mein-deutschbuch.de/nebensaetze-dass.html"
+    "link": "https://mein-deutschbuch.de/dass-saetze-im-akkusativ.html"
   },
   "322_42": {
     "text": "Допоміжне дієслово 'werden' використовується для утворення майбутнього часу (Futur I): 'werden ... verstehen' (будуть розуміти).",
@@ -265,7 +265,7 @@
   },
   "273_19": {
     "text": "Пасивний стан (Perfekt Passiv): 'були знайдені ручні гранати' (Handgranaten gefunden worden).",
-    "link": "https://mein-deutschbuch.de/passiv-perfekt.html"
+    "link": "https://mein-deutschbuch.de/vorgangspassiv.html"
   },
   "273_21": {
     "text": "Пасивний стан (Präsens Passiv + Konjunktiv I): 'зараз допитується далі в Стамбулі' (werde derzeit weiter in Istanbul verhört).",
@@ -277,7 +277,7 @@
   },
   "273_23": {
     "text": "Дієслово у множині 'drohen' (загрожують), оскільки підмет у множині. Керування: drohen + Dativ (загрожувати комусь).",
-    "link": "https://mein-deutschbuch.de/verben-mit-datiivergaenzungen.html"
+    "link": "https://mein-deutschbuch.de/dativ-ergaenzung.html"
   },
   "273_24": {
     "text": "Прийменник 'gegen' (проти) вимагає Akkusativ: 'Gesetz gegen Betrug' (закон проти шахрайства).",
@@ -285,7 +285,7 @@
   },
   "273_25": {
     "text": "Пасивний стан (Passiv) у минулому часі: 'wurde ... beschlossen' (було прийнято).",
-    "link": "https://mein-deutschbuch.de/passiv.html"
+    "link": "https://mein-deutschbuch.de/passiv-formen.html"
   },
   "273_26": {
     "text": "Родовий відмінок (Genitiv): 'Auf der Grundlage des neuen Gesetzes' (На основі нового закону).",
@@ -293,11 +293,11 @@
   },
   "273_27": {
     "text": "Інфінітив пасивного стану: 'können ... bestraft werden' (можуть бути покарані).",
-    "link": "https://mein-deutschbuch.de/passiv.html"
+    "link": "https://mein-deutschbuch.de/passiv-formen.html"
   },
   "273_29": {
     "text": "Найвищий ступінь порівняння прикметника (Superlativ) у знахідному відмінку (Akkusativ): 'den größten Skandal' (найбільший скандал).",
-    "link": "https://mein-deutschbuch.de/komparation.html"
+    "link": "https://mein-deutschbuch.de/komparativ-superlativ.html"
   },
   "273_30": {
     "text": "Стійке керування: 'beteiligt sein an' + Dativ (бути причетним до чогось).",
