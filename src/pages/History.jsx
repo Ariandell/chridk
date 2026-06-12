@@ -151,32 +151,31 @@ const History = () => {
               )}
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-                <div>
+                <div style={{ paddingRight: '1rem' }}>
                   <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-primary)', fontSize: '1.4rem' }}>{entry.title}</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 'bold' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 'bold', flexWrap: 'wrap' }}>
                     <span className="clip-diagonal" style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', background: 'rgba(217, 15, 35, 0.1)', padding: '0.2rem 0.6rem' }}>
                       {entry.subjectId}
                     </span>
                     <span>{new Date(entry.date).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}</span>
+                    <button 
+                      onClick={() => handleDeleteEntry(entry.id)}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '0.2rem', display: 'flex', alignItems: 'center', transition: 'all 0.2s' }}
+                      title="Видалити запис"
+                      onMouseOver={(e) => { e.currentTarget.style.color = 'var(--error)'; e.currentTarget.style.opacity = 1; }}
+                      onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.opacity = 0.6; }}
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <div style={{ fontSize: '2.5rem', fontWeight: '900', color: scoreColor, textShadow: `2px 2px 0 #000`, whiteSpace: 'nowrap' }}>
                     {entry.score} / {entry.totalQuestions}
                   </div>
                   <div style={{ color: scoreColor, fontWeight: 'bold', fontSize: '1.1rem', textTransform: 'uppercase' }}>{percentage}% Правильно</div>
                 </div>
               </div>
-              
-              <button 
-                onClick={() => handleDeleteEntry(entry.id)}
-                style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', opacity: 0.6, zIndex: 5 }}
-                title="Видалити запис"
-                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                onMouseOut={(e) => e.currentTarget.style.opacity = 0.6}
-              >
-                <Trash2 size={20} />
-              </button>
             </div>
           );
         })}
