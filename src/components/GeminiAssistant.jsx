@@ -93,7 +93,7 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
         onClick={() => setIsOpen(true)}
         style={{ display: isOpen ? 'none' : 'flex', padding: '0.5rem 1rem', gap: '0.5rem', background: 'var(--accent-secondary)', borderColor: 'var(--accent-secondary)' }}
       >
-        <Sparkles size={18} /> GEMINI
+        <Sparkles size={18} /> <span className="gemini-btn-text">GEMINI</span>
       </button>
 
       {/* Chat Window Portaled to Body to escape Header CSS constraints */}
