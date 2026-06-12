@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, AlertCircle, ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
+import { BookOpen, AlertCircle, ArrowRight, CheckCircle2, XCircle, Menu, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
@@ -23,6 +23,20 @@ const Materials = () => {
   const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
   const [testAnswers, setTestAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+
+  // Handle window resize for sidebar
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && !isSidebarOpen) {
+        setIsSidebarOpen(true);
+      } else if (window.innerWidth <= 768 && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isSidebarOpen]);
 
   const scrollRef = useRef(null);
 
@@ -54,6 +68,9 @@ const Materials = () => {
     setTestAnswers({});
     setShowResults(false);
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const handleNextBlock = () => {
@@ -89,12 +106,54 @@ const Materials = () => {
   }
 
   return (
-    <div className="container" style={{ display: 'flex', gap: '2rem', marginTop: '2rem', height: 'calc(100vh - 120px)' }}>
+    <div className="container materials-layout" style={{ display: 'flex', gap: '2rem', marginTop: '2rem', height: 'calc(100vh - 120px)', position: 'relative' }}>
+      
+      {/* Mobile Toggle Button */}
+      <button 
+        className="btn btn-primary clip-diagonal mobile-sidebar-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        style={{
+          position: 'absolute',
+          top: '-1rem',
+          left: '0',
+          zIndex: 100,
+          display: window.innerWidth > 768 ? 'none' : 'flex'
+        }}
+      >
+        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        <span style={{ marginLeft: '0.5rem' }}>Теми</span>
+      </button>
+
       {/* Sidebar */}
-      <div className="glass-panel" style={{ width: '300px', flexShrink: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '1.5rem' }}>
-        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: 'var(--accent-primary)', fontSize: '1.5rem', textTransform: 'uppercase' }}>
-          <BookOpen size={24} /> Теми ЄФВВ
-        </h2>
+      <div className={`glass-panel materials-sidebar ${isSidebarOpen ? 'open' : 'closed'}`} style={{ 
+        width: isSidebarOpen ? (window.innerWidth > 768 ? '300px' : '100%') : '0', 
+        opacity: isSidebarOpen ? 1 : 0,
+        pointerEvents: isSidebarOpen ? 'auto' : 'none',
+        flexShrink: 0, 
+        overflowY: 'auto', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '0.5rem', 
+        padding: isSidebarOpen ? '1.5rem' : '0',
+        transition: 'all 0.3s ease',
+        position: window.innerWidth > 768 ? 'relative' : 'absolute',
+        zIndex: 90,
+        height: window.innerWidth > 768 ? 'auto' : 'calc(100% - 3rem)',
+        top: window.innerWidth > 768 ? '0' : '3rem',
+        left: 0,
+        background: 'var(--bg-secondary)',
+        borderWidth: isSidebarOpen ? '3px' : '0'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--accent-primary)', fontSize: '1.5rem', textTransform: 'uppercase' }}>
+            <BookOpen size={24} /> Теми ЄФВВ
+          </h2>
+          {window.innerWidth > 768 && (
+            <button className="btn btn-secondary" style={{ padding: '0.5rem' }} onClick={() => setIsSidebarOpen(false)}>
+              <X size={20} />
+            </button>
+          )}
+        </div>
         
         {topics.length === 0 ? (
           <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic' }}>
@@ -124,7 +183,27 @@ const Materials = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="glass-panel" ref={scrollRef} style={{ flexGrow: 1, overflowY: 'auto', padding: '2.5rem', position: 'relative' }}>
+      <div className="glass-panel materials-content" ref={scrollRef} style={{ 
+        flexGrow: 1, 
+        overflowY: 'auto', 
+        padding: window.innerWidth > 768 ? '2.5rem' : '1.5rem',
+        paddingTop: window.innerWidth > 768 ? '2.5rem' : '3.5rem',
+        position: 'relative',
+        display: window.innerWidth <= 768 && isSidebarOpen ? 'none' : 'block'
+      }}>
+        
+        {/* Desktop Open Sidebar Button (if closed) */}
+        {window.innerWidth > 768 && !isSidebarOpen && (
+          <button 
+            className="btn btn-primary"
+            onClick={() => setIsSidebarOpen(true)}
+            style={{ position: 'absolute', top: '1rem', left: '1rem', padding: '0.5rem', zIndex: 10 }}
+            title="Відкрити теми"
+          >
+            <Menu size={24} />
+          </button>
+        )}
+
         {!selectedTopicId ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)' }}>
             <BookOpen size={64} style={{ marginBottom: '1rem', opacity: 0.5 }} />
