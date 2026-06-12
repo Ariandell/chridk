@@ -64,13 +64,7 @@ const Exam = () => {
     try {
       const saved = localStorage.getItem(`exam_progress_${subjectId}_${sessionId}`);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        if (subjectId === 'tznk' && !parsed.penaltyApplied) {
-          parsed.timeLeft = Math.max(0, (parsed.timeLeft || 0) - 4500);
-          parsed.penaltyApplied = true;
-          localStorage.setItem(`exam_progress_${subjectId}_${sessionId}`, JSON.stringify(parsed));
-        }
-        return parsed;
+        return JSON.parse(saved);
       }
       return null;
     } catch { return null; }
@@ -81,7 +75,6 @@ const Exam = () => {
   const [showHint, setShowHint] = useState(false);
   const [answers, setAnswers] = useState(savedProgress?.answers || {}); // { questionId: selectedOptionId }
   const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? (data ? (data.durationMinutes || 150) * 60 : 0));
-  const [penaltyApplied, setPenaltyApplied] = useState(savedProgress?.penaltyApplied || (subjectId === 'tznk'));
   const [isFinished, setIsFinished] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [pauseTimeLeft, setPauseTimeLeft] = useState(300); // 5 minutes max pause
@@ -94,10 +87,9 @@ const Exam = () => {
     localStorage.setItem(`exam_progress_${subjectId}_${sessionId}`, JSON.stringify({
       answers,
       currentQuestionIdx,
-      timeLeft,
-      penaltyApplied
+      timeLeft
     }));
-  }, [answers, currentQuestionIdx, timeLeft, penaltyApplied, subjectId, sessionId, data, isFinished]);
+  }, [answers, currentQuestionIdx, timeLeft, subjectId, sessionId, data, isFinished]);
 
   useEffect(() => {
     setPortalTarget(document.getElementById('header-portal-target'));
