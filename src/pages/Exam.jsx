@@ -194,12 +194,19 @@ const Exam = () => {
   }, [answers, currentQuestion, isPaused]);
 
   const handleOptionSelect = (optionId) => {
-    if (isAnswered || isPaused) return;
+    if (isPaused) return;
     playSelectSound();
-    setAnswers({
-      ...answers,
-      [currentQuestion.id]: optionId
-    });
+    
+    if (answers[currentQuestion.id] === optionId) {
+      const newAnswers = { ...answers };
+      delete newAnswers[currentQuestion.id];
+      setAnswers(newAnswers);
+    } else {
+      setAnswers({
+        ...answers,
+        [currentQuestion.id]: optionId
+      });
+    }
   };
 
   const toggleExpansion = (id) => {
@@ -466,7 +473,7 @@ const Exam = () => {
                 <div
                   className={className}
                   onClick={() => handleOptionSelect(option.id)}
-                  style={{ cursor: (isAnswered || isPaused) ? 'default' : 'pointer' }}
+                  style={{ cursor: isPaused ? 'default' : 'pointer' }}
                   role="button"
                 >
                   <div className="option-letter">{option.id}</div>
