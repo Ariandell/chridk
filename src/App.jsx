@@ -8,6 +8,7 @@ import Results from './pages/Results';
 import History from './pages/History';
 import Braindead from './pages/Braindead';
 import Admin from './pages/Admin';
+import Materials from './pages/Materials';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/braindead" element={<Braindead />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/materials" element={<Materials />} />
         </Routes>
       </main>
     </>

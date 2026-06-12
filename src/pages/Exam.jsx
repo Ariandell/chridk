@@ -8,6 +8,12 @@ import eviData from '../data/tests/evi_german.json';
 import germanExps from '../data/tests/german_explanations.json';
 import germanHints from '../data/tests/german_grammar_hints.json';
 import { saveTestResult } from '../utils/history';
+import { auth } from '../utils/firebase';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { getImagePath } from '../utils/imagePath';
 import GeminiAssistant from '../components/GeminiAssistant';
 import TranslatorTooltip from '../components/TranslatorTooltip';
@@ -410,8 +416,10 @@ const Exam = () => {
           </div>
         )}
 
-        <div className="question-text" style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '2rem' }}>
-          {currentQuestion.text}
+        <div className="question-text markdown-body" style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '2rem' }}>
+          <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
+            {currentQuestion.text}
+          </ReactMarkdown>
           {currentQuestion.originalImageUrl && (
             <div style={{ marginTop: '1rem' }}>
               <div 
@@ -478,8 +486,10 @@ const Exam = () => {
                   role="button"
                 >
                   <div className="option-letter">{option.id}</div>
-                  <div style={{ flexGrow: 1, textAlign: 'left', whiteSpace: 'pre-wrap' }}>
-                    {option.text}
+                  <div style={{ flexGrow: 1, textAlign: 'left', whiteSpace: 'pre-wrap' }} className="markdown-body">
+                    <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
+                      {option.text}
+                    </ReactMarkdown>
                     
                     {option.imageUrl && (
                       <div style={{ marginTop: '0.5rem', background: 'var(--bg-primary)', padding: '0.5rem', border: '2px solid var(--border-color)', display: 'inline-block' }}>

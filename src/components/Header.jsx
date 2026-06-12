@@ -34,6 +34,12 @@ const Header = () => {
         </Link>
         <div id="header-portal-target" style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: 'auto', transform: 'rotate(1deg)' }}>
           {/* Exam controls will portal here */}
+          
+          <Link to="/materials" className="btn btn-secondary clip-diagonal" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', fontWeight: 'bold' }}>
+            <BookOpen size={18} />
+            Матеріали
+          </Link>
+
           {streak > 0 && (
             <div className="clip-diagonal" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#ff6b6b', fontWeight: 'bold', fontSize: '1.1rem', background: 'rgba(217, 15, 35, 0.1)', padding: '0.3rem 0.8rem', border: '2px solid rgba(217, 15, 35, 0.3)' }}>
               <Flame size={18} color="#ff6b6b" /> {streak}

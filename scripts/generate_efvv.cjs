@@ -1,0 +1,164 @@
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const OpenAI = require('openai');
+
+const API_KEY = process.env.ALIBABA_API_KEY || '';
+
+if (!API_KEY) {
+  console.error("ALIBABA_API_KEY is not set");
+  process.exit(1);
+}
+
+const client = new OpenAI({
+  apiKey: API_KEY,
+  baseURL: "https://ws-rs76nyppxqtnvawo.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+});
+
+const MODEL_NAME = 'qwen3.7-max';
+
+const efvvPath = path.join(__dirname, '../src/data/tests/efvv_it.json');
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
+async function fetchExplanation(questionObj) {
+  const prompt = `Ти топовий експерт з інформаційних технологій.
+Твоя мета - пояснити, чому правильна відповідь у тесті є правильною, і чому інші варіанти є неправильними.
+Я вже вказав, де правильна відповідь. Тобі не треба її вгадувати, просто обґрунтуй її та детально поясни.
+
+ПИТАННЯ: "${questionObj.question}"
+
+ВАРІАНТИ ВІДПОВІДЕЙ:
+${questionObj.options.map((opt, i) => `${i + 1}. ${opt.text} [ЦЕ ${opt.isCorrect ? 'ПРАВИЛЬНА' : 'НЕПРАВИЛЬНА'} ВІДПОВІДЬ]`).join('\n')}
+
+УВАГА! Ти МАЄШ повернути відповідь СУВОРО у форматі JSON.
+{
+  "explanations": {
+    "Текст варіанту 1": "Детальне професійне пояснення чому це правильно або неправильно.",
+    "Текст варіанту 2": "Пояснення...",
+    "Текст варіанту N": "Пояснення..."
+  }
+}
+
+Правила:
+1. Ключі в "explanations" МАЮТЬ ТОЧНО СПІВПАДАТИ з текстом варіантів (без тегів [ПРАВИЛЬНА] і т.д.).
+2. Пояснення мають бути дійсно детальними і експертними. Розкривай суть термінів, наводь короткі приклади або аналогії, якщо доречно.
+3. Лише чистий JSON.`;
+
+  try {
+    console.log(`\n==================== Thinking Process for ${questionObj.id} ====================`);
+    
+    const stream = await client.chat.completions.create({
+      model: MODEL_NAME,
+      messages: [
+        { role: "system", content: "Ти корисний AI-асистент, який повертає ТІЛЬКИ валідний JSON." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.2,
+      stream: true,
+    });
+
+    let isAnswering = false;
+    let fullResponse = "";
+
+    for await (const chunk of stream) {
+      if (!chunk.choices || chunk.choices.length === 0) continue;
+      
+      const delta = chunk.choices[0].delta;
+      
+      if (delta.reasoning_content) {
+        if (!isAnswering) {
+          process.stdout.write(delta.reasoning_content);
+        }
+      }
+      
+      if (delta.content) {
+        if (!isAnswering) {
+          console.log(`\n==================== Full Response for ${questionObj.id} ====================`);
+          isAnswering = true;
+        }
+        process.stdout.write(delta.content);
+        fullResponse += delta.content;
+      }
+    }
+    
+    console.log("\n"); 
+
+    if (!fullResponse) return null;
+    
+    let jsonStr = fullResponse;
+    const jsonMatch = fullResponse.match(/```json\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[1];
+    } else {
+      const start = fullResponse.indexOf('{');
+      const end = fullResponse.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        jsonStr = fullResponse.substring(start, end + 1);
+      }
+    }
+
+    const parsed = JSON.parse(jsonStr);
+    return parsed.explanations;
+  } catch (error) {
+    console.error("API Error:", error.message);
+    return null;
+  }
+}
+
+async function main() {
+  const data = JSON.parse(fs.readFileSync(efvvPath, 'utf8'));
+  
+  const allQuestions = [];
+  data.sessions.forEach(session => {
+    session.questions.forEach(q => allQuestions.push(q));
+  });
+
+  // Process all questions to rewrite existing weak explanations
+  const remainingQuestions = allQuestions;
+
+  console.log(`Всього питань: ${allQuestions.length}. Залишилось обробити: ${remainingQuestions.length}`);
+
+  for (let i = 0; i < remainingQuestions.length; i++) {
+    const q = remainingQuestions[i];
+    console.log(`\n[${i + 1}/${remainingQuestions.length}] Обробка питання: ${q.text.substring(0, 60)}...`);
+    
+    const qObj = {
+      id: q.id,
+      question: q.text,
+      options: q.options.map(o => ({ text: o.text, isCorrect: o.isCorrect }))
+    };
+    
+    let attempts = 0;
+    let exps = null;
+    while (attempts < 3 && !exps) {
+      exps = await fetchExplanation(qObj);
+      if (!exps) {
+        attempts++;
+        await delay(2000 * attempts);
+      }
+    }
+    
+    if (exps) {
+      q.options.forEach(opt => {
+        let key = Object.keys(exps).find(k => k.trim() === opt.text.trim());
+        if (!key) {
+          key = Object.keys(exps).find(k => opt.text.includes(k) || k.includes(opt.text));
+        }
+        if (key && exps[key]) {
+          opt.explanation = exps[key];
+        }
+      });
+      fs.writeFileSync(efvvPath, JSON.stringify(data, null, 2), 'utf8');
+      console.log(`[+] Збережено.`);
+    } else {
+      console.log(`[-] Помилка отримання.`);
+    }
+    
+    await delay(1000);
+  }
+  
+  console.log("Генерацію успішно завершено!");
+}
+
+main();
