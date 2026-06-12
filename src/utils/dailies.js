@@ -21,8 +21,7 @@ const QUEST_TEMPLATES = [
   { id: 'correct_50', text: 'Дати 50 правильних відповідей за день', icon: '🔥', color: '#e63946', target: 50, type: 'correct_answers' },
 
   // === Time-based / streak ===
-  { id: 'streak_3', text: 'Підтримуй стрік 3+ дні', icon: '🔥', color: '#e63946', target: 3, type: 'streak_min' },
-  { id: 'streak_7', text: 'Підтримуй стрік 7+ днів!', icon: '⚡', color: '#ffd166', target: 7, type: 'streak_min' },
+  // (Streak quests removed as they cannot be completed in a single day)
 
   // === Variety ===
   { id: 'two_subjects', text: 'Пройди тести з 2 різних предметів', icon: '📚', color: '#9b5de5', target: 2, type: 'unique_subjects' },
@@ -67,7 +66,7 @@ export const initializeDailies = () => {
   const today = getTodayDate();
   const current = getDailies();
   
-  if (!current || current.lastQuestDate !== today) {
+  if (!current || current.lastQuestDate !== today || current.quests.some(q => !QUEST_TEMPLATES.find(t => t.id === q.id))) {
     // Same 3 quests all day (seeded by date)
     const shuffled = seededShuffle(QUEST_TEMPLATES, dateSeed(today));
     const selectedQuests = shuffled.slice(0, 3).map(q => ({ ...q, progress: 0, completed: false }));
