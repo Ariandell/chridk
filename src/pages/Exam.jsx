@@ -11,6 +11,7 @@ import { saveTestResult } from '../utils/history';
 import { getImagePath } from '../utils/imagePath';
 import GeminiAssistant from '../components/GeminiAssistant';
 import TranslatorTooltip from '../components/TranslatorTooltip';
+import { playSelectSound } from '../utils/sound';
 import { getSessionById } from '../utils/testModes';
 
 const TEST_DATA = {
@@ -171,6 +172,7 @@ const Exam = () => {
 
   const handleOptionSelect = (optionId) => {
     if (isAnswered || isPaused) return;
+    playSelectSound();
     setAnswers({
       ...answers,
       [currentQuestion.id]: optionId
@@ -183,6 +185,7 @@ const Exam = () => {
 
   const handleNext = () => {
     if (currentQuestionIdx < data.questions.length - 1) {
+      playSelectSound();
       setCurrentQuestionIdx(currentQuestionIdx + 1);
       setExpandedOptions({});
     }

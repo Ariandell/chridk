@@ -5,6 +5,7 @@ import efvvData from '../data/tests/efvv_it.json';
 import tznkData from '../data/tests/tznk.json';
 import eviData from '../data/tests/evi_german.json';
 import { getSessionsForSubject } from '../utils/testModes';
+import { playSelectSound } from '../utils/sound';
 
 const TEST_DATA = {
   efvv_it: efvvData,
@@ -71,7 +72,10 @@ const Subject = () => {
             <button 
               className="btn btn-primary"
               style={{ width: '100%' }}
-              onClick={() => navigate(`/exam/${subjectId}/${session.id}`)}
+              onClick={() => {
+                playSelectSound();
+                navigate(`/exam/${subjectId}/${session.id}`);
+              }}
             >
               Пройти тест
             </button>

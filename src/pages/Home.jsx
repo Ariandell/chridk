@@ -5,6 +5,7 @@ import { initializeDailies } from '../utils/dailies';
 import efvvData from '../data/tests/efvv_it.json';
 import tznkData from '../data/tests/tznk.json';
 import eviData from '../data/tests/evi_german.json';
+import { playSelectSound } from '../utils/sound';
 
 const SUBJECTS = [
   {
@@ -135,7 +136,10 @@ const Home = () => {
               <button 
                 className="btn btn-primary"
                 style={{ width: '100%' }}
-                onClick={() => navigate(`/subject/${subject.id}`)}
+                onClick={() => {
+                  playSelectSound();
+                  navigate(`/subject/${subject.id}`);
+                }}
               >
                 Вибрати іспит
               </button>
