@@ -8,12 +8,17 @@ import eviData from '../data/tests/evi_german.json';
 import germanExps from '../data/tests/german_explanations.json';
 import germanHints from '../data/tests/german_grammar_hints.json';
 import { saveTestResult } from '../utils/history';
-import { auth } from '../utils/firebase';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+
+const preprocessLatex = (text) => {
+  if (!text) return "";
+  // Convert \( \) and \[ \] to $ $ and $$ $$ for react-markdown
+  return text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$').replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+};
 import { getImagePath } from '../utils/imagePath';
 import GeminiAssistant from '../components/GeminiAssistant';
 import TranslatorTooltip from '../components/TranslatorTooltip';
@@ -418,7 +423,7 @@ const Exam = () => {
 
         <div className="question-text markdown-body" style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '2rem' }}>
           <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
-            {currentQuestion.text}
+            {preprocessLatex(currentQuestion.text)}
           </ReactMarkdown>
           {currentQuestion.originalImageUrl && (
             <div style={{ marginTop: '1rem' }}>
@@ -488,7 +493,7 @@ const Exam = () => {
                   <div className="option-letter">{option.id}</div>
                   <div style={{ flexGrow: 1, textAlign: 'left', whiteSpace: 'pre-wrap' }} className="markdown-body">
                     <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
-                      {option.text}
+                      {preprocessLatex(option.text)}
                     </ReactMarkdown>
                     
                     {option.imageUrl && (

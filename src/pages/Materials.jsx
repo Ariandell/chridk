@@ -13,6 +13,11 @@ import 'katex/dist/katex.min.css';
 import topicsData from '../data/topics.json';
 import materialsData from '../data/materials.json';
 
+const preprocessLatex = (text) => {
+  if (!text) return "";
+  return text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$').replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+};
+
 const Materials = () => {
   const [topics, setTopics] = useState([]);
   const [materials, setMaterials] = useState({});
@@ -92,7 +97,7 @@ const Materials = () => {
               remarkPlugins={[remarkMath, remarkGfm]} 
               rehypePlugins={[rehypeKatex]}
             >
-              {selectedMaterial}
+              {preprocessLatex(selectedMaterial)}
             </ReactMarkdown>
           </div>
         )}
