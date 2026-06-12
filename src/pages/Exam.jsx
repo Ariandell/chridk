@@ -418,7 +418,26 @@ const Exam = () => {
             // Filter out the dummy placeholder text that was injected into evi_german.json
             const isDummy = option.explanation && option.explanation.includes("наразі недоступне");
             const validOptionExp = isDummy ? null : option.explanation;
-            const explanationText = validOptionExp || (germanExps[currentQuestion.id] && germanExps[currentQuestion.id][option.id]);
+            
+            let matchFromExps = null;
+            if (germanExps[currentQuestion.id]) {
+              if (germanExps[currentQuestion.id][option.id]) {
+                matchFromExps = germanExps[currentQuestion.id][option.id];
+              } else {
+                const expKeys = Object.keys(germanExps[currentQuestion.id]);
+                // Try exact match first
+                let matchedKey = expKeys.find(k => k.trim() === option.text.trim());
+                // If not found, try partial match (sometimes AI trims differently)
+                if (!matchedKey) {
+                   matchedKey = expKeys.find(k => option.text.includes(k) || k.includes(option.text));
+                }
+                if (matchedKey) {
+                  matchFromExps = germanExps[currentQuestion.id][matchedKey];
+                }
+              }
+            }
+            
+            const explanationText = validOptionExp || matchFromExps;
             const questionHasExps = validOptionExp || (germanExps[currentQuestion.id] && Object.keys(germanExps[currentQuestion.id]).length > 0);
 
             return (
