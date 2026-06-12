@@ -63,7 +63,16 @@ const Exam = () => {
   const getInitialProgress = () => {
     try {
       const saved = localStorage.getItem(`exam_progress_${subjectId}_${sessionId}`);
-      return saved ? JSON.parse(saved) : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (subjectId === 'tznk' && !parsed.penaltyApplied) {
+          parsed.timeLeft = Math.max(0, (parsed.timeLeft || 0) - 4500);
+          parsed.penaltyApplied = true;
+          localStorage.setItem(`exam_progress_${subjectId}_${sessionId}`, JSON.stringify(parsed));
+        }
+        return parsed;
+      }
+      return null;
     } catch { return null; }
   };
   const savedProgress = getInitialProgress();
@@ -72,6 +81,7 @@ const Exam = () => {
   const [showHint, setShowHint] = useState(false);
   const [answers, setAnswers] = useState(savedProgress?.answers || {}); // { questionId: selectedOptionId }
   const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? (data ? (data.durationMinutes || 150) * 60 : 0));
+  const [penaltyApplied, setPenaltyApplied] = useState(savedProgress?.penaltyApplied || (subjectId === 'tznk'));
   const [isFinished, setIsFinished] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [pauseTimeLeft, setPauseTimeLeft] = useState(300); // 5 minutes max pause
@@ -84,9 +94,10 @@ const Exam = () => {
     localStorage.setItem(`exam_progress_${subjectId}_${sessionId}`, JSON.stringify({
       answers,
       currentQuestionIdx,
-      timeLeft
+      timeLeft,
+      penaltyApplied
     }));
-  }, [answers, currentQuestionIdx, timeLeft, subjectId, sessionId, data, isFinished]);
+  }, [answers, currentQuestionIdx, timeLeft, penaltyApplied, subjectId, sessionId, data, isFinished]);
 
   useEffect(() => {
     setPortalTarget(document.getElementById('header-portal-target'));
@@ -99,36 +110,64 @@ const Exam = () => {
     setTranslationContext(null);
   }, [currentQuestionIdx]);
 
+  // Use ref to keep track of the last tick for background tab accuracy
+  const lastTickTime = React.useRef(Date.now());
+  const answersRef = React.useRef(answers);
+  
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
   useEffect(() => {
     if (!data) {
       navigate('/');
       return;
     }
 
+    lastTickTime.current = Date.now(); // Reset on mount or pause change
+
     const timer = setInterval(() => {
+      const now = Date.now();
+      const deltaSecs = (now - lastTickTime.current) / 1000;
+      lastTickTime.current = now;
+
       if (isPaused) {
         setPauseTimeLeft((prev) => {
-          if (prev <= 1) {
+          if (prev - deltaSecs <= 0) {
             setIsPaused(false); // Auto unpause
             return 300;
           }
-          return prev - 1;
+          return prev - deltaSecs;
         });
         return;
       }
 
       setTimeLeft((prev) => {
-        if (prev <= 1) {
+        const nextTime = prev - deltaSecs;
+        if (nextTime <= 1 && prev > 1) {
           clearInterval(timer);
-          handleFinish();
+          // Manually handle finish to avoid stale closure
+          setIsFinished(true);
+          localStorage.removeItem(`exam_progress_${subjectId}_${sessionId}`);
+          
+          let score = 0;
+          data.questions.forEach(q => {
+            const selectedId = answersRef.current[q.id];
+            if (selectedId) {
+              const option = q.options.find(o => o.id === selectedId);
+              if (option && option.isCorrect) score++;
+            }
+          });
+          saveTestResult(subjectId, sessionId, data.title, score, data.questions.length, answersRef.current);
+          navigate('/results', { state: { data, answers: answersRef.current, subjectId } });
           return 0;
         }
-        return prev - 1;
+        return Math.max(0, nextTime);
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [data, navigate, isPaused]);
+  }, [data, navigate, isPaused, subjectId, sessionId]);
 
   if (!data) return null;
 
