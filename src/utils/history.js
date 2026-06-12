@@ -124,3 +124,17 @@ export const clearHistory = () => {
     console.error("Failed to clear history:", error);
   }
 };
+
+// Delete a single history entry
+export const deleteHistoryEntry = (id) => {
+  try {
+    const history = getHistory();
+    const updatedHistory = history.filter(entry => entry.id !== id);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
+    pushToCloud(updatedHistory, getDailies());
+    return updatedHistory;
+  } catch (error) {
+    console.error("Failed to delete history entry:", error);
+    return getHistory();
+  }
+};
