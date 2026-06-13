@@ -15,7 +15,17 @@ import DeepSeekAssistant from '../components/DeepSeekAssistant';
 
 const preprocessLatex = (text) => {
   if (!text) return "";
-  return text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$').replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+  let res = text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$').replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+  
+  // Wrap unescaped \begin{}...\end{} in $$ $$
+  const environments = ['gather', 'align', 'equation', 'pmatrix', 'bmatrix', 'vmatrix', 'Bmatrix', 'Vmatrix', 'cases', 'array'];
+  const envRegex = new RegExp(`(\\\\begin\\{(${environments.join('|')})\\*?\\}[\\s\\S]*?\\\\end\\{\\2\\*?\\})`, 'g');
+  
+  res = res.replace(envRegex, (match) => `\n$$\n${match}\n$$\n`);
+  
+  // Fix cases where it might have been wrapped already (e.g., $$$$ \begin... $$$$)
+  res = res.replace(/\$\$\s*\$\$/g, '$$');
+  return res;
 };
 
 const Materials = () => {
@@ -216,7 +226,7 @@ const Materials = () => {
             <BookOpen size={24} /> Теми
           </h2>
           {window.innerWidth > 768 && (
-            <button className="btn btn-secondary" style={{ padding: '0.5rem' }} onClick={() => setIsSidebarOpen(false)}>
+            <button className="btn btn-secondary" style={{ padding: '0.5rem' }} onClick={() => { playSelectSound(); setIsSidebarOpen(false); }}>
               <X size={20} />
             </button>
           )}
@@ -227,14 +237,14 @@ const Materials = () => {
           <button 
             className={`btn ${selectedSubject === 'efvv_it' ? 'btn-primary' : 'btn-secondary'} clip-sharp`} 
             style={{ flex: 1, padding: '0.5rem', fontSize: '0.9rem' }}
-            onClick={() => setSelectedSubject('efvv_it')}
+            onClick={() => { playSelectSound(); setSelectedSubject('efvv_it'); }}
           >
             ІТ (ЄФВВ)
           </button>
           <button 
             className={`btn ${selectedSubject === 'tznk' ? 'btn-primary' : 'btn-secondary'} clip-sharp`} 
             style={{ flex: 1, padding: '0.5rem', fontSize: '0.9rem' }}
-            onClick={() => setSelectedSubject('tznk')}
+            onClick={() => { playSelectSound(); setSelectedSubject('tznk'); }}
           >
             Логіка (ТЗНК)
           </button>
@@ -281,7 +291,7 @@ const Materials = () => {
         {window.innerWidth > 768 && !isSidebarOpen && (
           <button 
             className="btn btn-primary"
-            onClick={() => setIsSidebarOpen(true)}
+            onClick={() => { playSelectSound(); setIsSidebarOpen(true); }}
             style={{ position: 'absolute', top: '1rem', left: '1rem', padding: '0.5rem', zIndex: 10 }}
             title="Відкрити теми"
           >
@@ -361,7 +371,7 @@ const Materials = () => {
                             key={opt.id}
                             className={btnClass}
                             style={{ justifyContent: 'flex-start', textAlign: 'left', whiteSpace: 'normal', height: 'auto', textTransform: 'none' }}
-                            onClick={() => handleOptionSelect(idx, opt.id)}
+                            onClick={() => { playSelectSound(); handleOptionSelect(idx, opt.id); }}
                             disabled={showResults}
                           >
                             <span style={{ fontWeight: 'bold', marginRight: '0.5rem', color: showResults && opt.id === test.answer ? '#fff' : 'inherit' }}>{opt.id}:</span> 
@@ -392,7 +402,7 @@ const Materials = () => {
                   <button 
                     className="btn btn-primary clip-diagonal" 
                     style={{ width: '100%', marginTop: '1rem', padding: '1rem', fontSize: '1.2rem' }}
-                    onClick={checkAnswers}
+                    onClick={() => { playSelectSound(); checkAnswers(); }}
                     disabled={!allTestsAnswered}
                   >
                     Перевірити відповіді
@@ -406,17 +416,17 @@ const Materials = () => {
                     
                     {!isPassed ? (
                       <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <button className="btn btn-secondary clip-diagonal" onClick={handleRetry} style={{ fontSize: '1.2rem', padding: '1rem 2rem' }}>
+                        <button className="btn btn-secondary clip-diagonal" onClick={() => { playSelectSound(); handleRetry(); }} style={{ fontSize: '1.2rem', padding: '1rem 2rem' }}>
                           Спробувати ще раз <RefreshCw style={{ marginLeft: '0.5rem' }} size={18} />
                         </button>
                         {retryCount >= 2 && !showHints && (
-                          <button className="btn btn-secondary clip-diagonal" onClick={() => setShowHints(true)} style={{ fontSize: '1.2rem', padding: '1rem 2rem', opacity: 0.8, borderColor: 'var(--accent-yellow)', color: 'var(--accent-yellow)' }}>
+                          <button className="btn btn-secondary clip-diagonal" onClick={() => { playSelectSound(); setShowHints(true); }} style={{ fontSize: '1.2rem', padding: '1rem 2rem', opacity: 0.8, borderColor: 'var(--accent-yellow)', color: 'var(--accent-yellow)' }}>
                             Показати підказки
                           </button>
                         )}
                       </div>
                     ) : currentBlockIndex < blocks.length - 1 ? (
-                      <button className="btn btn-primary clip-diagonal" onClick={handleNextBlock} style={{ fontSize: '1.2rem', padding: '1rem 2rem' }}>
+                      <button className="btn btn-primary clip-diagonal" onClick={() => { playSelectSound(); handleNextBlock(); }} style={{ fontSize: '1.2rem', padding: '1rem 2rem' }}>
                         Наступний блок <ArrowRight style={{ marginLeft: '0.5rem' }} />
                       </button>
                     ) : (

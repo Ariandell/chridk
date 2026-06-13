@@ -16,8 +16,17 @@ import 'katex/dist/katex.min.css';
 
 const preprocessLatex = (text) => {
   if (!text) return "";
-  // Convert \( \) and \[ \] to $ $ and $$ $$ for react-markdown
-  return text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$').replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+  let res = text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$').replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+  
+  // Wrap unescaped \begin{}...\end{} in $$ $$
+  const environments = ['gather', 'align', 'equation', 'pmatrix', 'bmatrix', 'vmatrix', 'Bmatrix', 'Vmatrix', 'cases', 'array'];
+  const envRegex = new RegExp(`(\\\\begin\\{(${environments.join('|')})\\*?\\}[\\s\\S]*?\\\\end\\{\\2\\*?\\})`, 'g');
+  
+  res = res.replace(envRegex, (match) => `\n$$\n${match}\n$$\n`);
+  
+  // Fix cases where it might have been wrapped already (e.g., $$$$ \begin... $$$$)
+  res = res.replace(/\$\$\s*\$\$/g, '$$');
+  return res;
 };
 import { getImagePath } from '../utils/imagePath';
 import DeepSeekAssistant from '../components/DeepSeekAssistant';
@@ -234,12 +243,14 @@ const Exam = () => {
 
   const handlePrev = () => {
     if (currentQuestionIdx > 0) {
+      playSelectSound();
       setCurrentQuestionIdx(currentQuestionIdx - 1);
       setExpandedOptions({});
     }
   };
 
   const handleFinish = () => {
+    playSelectSound();
     setIsFinished(true);
     localStorage.removeItem(`exam_progress_${subjectId}_${sessionId}`);
     
@@ -259,6 +270,7 @@ const Exam = () => {
   };
 
   const handleResetTimer = () => {
+    playSelectSound();
     if (window.confirm('Ви впевнені, що хочете скинути таймер на початок?')) {
       setTimeLeft((data.durationMinutes || 150) * 60);
       setIsPaused(false);
@@ -266,6 +278,7 @@ const Exam = () => {
   };
 
   const togglePause = () => {
+    playSelectSound();
     setIsPaused(!isPaused);
   };
 
