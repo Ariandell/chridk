@@ -6,6 +6,8 @@ const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || '';
 const API_BASE_URL = import.meta.env.VITE_DEEPSEEK_API_URL || 'https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1';
 const API_URL = `${API_BASE_URL}/chat/completions`;
 
+console.log("DeepSeek ENV Debug:", API_KEY ? `Key is PRESENT (Length: ${API_KEY.length})` : "Key is MISSING!");
+
 const DeepSeekAssistant = ({ currentQuestion, answers, germanExps, subjectId, contextText }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
