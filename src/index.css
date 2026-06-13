@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,700&display=swap');
 
 :root {
   /* Persona 5 Color Palette */
@@ -165,6 +165,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 .btn-secondary:hover::before {
   left: 0;
+}
+
+.btn-secondary.selected {
+  border-color: var(--accent-primary);
+  background: rgba(217, 15, 35, 0.1);
+  transform: scale(1.02);
+  color: var(--text-primary);
+}
+
+.btn-secondary.correct {
+  border-color: var(--success) !important;
+  background: var(--success-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.btn-secondary.wrong {
+  border-color: var(--error) !important;
+  background: var(--error-bg) !important;
+  color: var(--text-primary) !important;
+  opacity: 0.8;
 }
 
 .btn:disabled {
