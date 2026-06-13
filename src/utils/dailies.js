@@ -37,15 +37,24 @@ export const getDailies = () => {
   return null;
 };
 
+const pad = n => n.toString().padStart(2, '0');
+
 const getTodayDate = () => {
   const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 };
 
 const getYesterdayDate = () => {
   const d = new Date();
   d.setDate(d.getDate() - 1);
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+const normalizeDate = (dStr) => {
+  if (!dStr) return '';
+  const parts = dStr.split('-');
+  if (parts.length !== 3) return dStr;
+  return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
 };
 
 // Seeded shuffle to keep same quests all day for the same date
@@ -64,48 +73,55 @@ const dateSeed = (dateStr) => dateStr.split('-').reduce((acc, n) => acc * 31 + p
 
 export const initializeDailies = () => {
   const today = getTodayDate();
-  const current = getDailies();
+  let current = getDailies();
   
-  if (!current || current.lastQuestDate !== today || current.quests.some(q => !QUEST_TEMPLATES.find(t => t.id === q.id))) {
+  let lastLogin = current?.lastLoginDate ? normalizeDate(current.lastLoginDate) : '';
+  let lastQuest = current?.lastQuestDate ? normalizeDate(current.lastQuestDate) : '';
+  let currentStreak = current?.streak || 0;
+
+  // Always update streak on visit
+  if (lastLogin !== today) {
+    if (lastLogin === getYesterdayDate()) {
+      currentStreak += 1;
+    } else {
+      currentStreak = 1;
+    }
+    lastLogin = today;
+  }
+
+  let needsSave = false;
+  let newData = { ...current };
+
+  if (!current || lastQuest !== today || current.quests.some(q => !QUEST_TEMPLATES.find(t => t.id === q.id))) {
     // Same 3 quests all day (seeded by date)
     const shuffled = seededShuffle(QUEST_TEMPLATES, dateSeed(today));
     const selectedQuests = shuffled.slice(0, 3).map(q => ({ ...q, progress: 0, completed: false }));
     
-    // Streak logic
-    let newStreak = current ? current.streak : 0;
-    if (current && current.lastLoginDate !== today && current.lastLoginDate !== getYesterdayDate()) {
-      newStreak = 0;
-    }
-    
-    const newData = {
-      ...current,
+    newData = {
+      ...newData,
       quests: selectedQuests,
       lastQuestDate: today,
-      lastLoginDate: current?.lastLoginDate || '',
-      streak: newStreak,
       uniqueSubjectsToday: []
     };
-    
-    localStorage.setItem(DAILIES_KEY, JSON.stringify(newData));
-    return newData;
+    needsSave = true;
   }
   
-  return current;
+  if (newData.streak !== currentStreak || newData.lastLoginDate !== lastLogin) {
+    newData.streak = currentStreak;
+    newData.lastLoginDate = lastLogin;
+    needsSave = true;
+  }
+
+  if (needsSave) {
+    localStorage.setItem(DAILIES_KEY, JSON.stringify(newData));
+  }
+  
+  return newData;
 };
 
 export const processTestResultForDailies = (result) => {
   const dailies = initializeDailies();
   const today = getTodayDate();
-  
-  // Update streak
-  if (dailies.lastLoginDate !== today) {
-    if (dailies.lastLoginDate === getYesterdayDate()) {
-      dailies.streak += 1;
-    } else {
-      dailies.streak = 1;
-    }
-    dailies.lastLoginDate = today;
-  }
   
   // Track unique subjects seen today
   if (!dailies.uniqueSubjectsToday) dailies.uniqueSubjectsToday = [];
