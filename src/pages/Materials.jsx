@@ -11,6 +11,7 @@ import materialsData from '../data/materials.json';
 import topicsOldData from '../data/topics_old.json';
 import materialsOldData from '../data/materials_old.json';
 import { getMaterialProgress, saveMaterialProgress } from '../utils/history';
+import { playSelectSound } from '../utils/sound';
 import DeepSeekAssistant from '../components/DeepSeekAssistant';
 
 const preprocessLatex = (text) => {
