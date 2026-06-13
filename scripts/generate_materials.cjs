@@ -3,19 +3,19 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const OpenAI = require('openai');
 
-const API_KEY = process.env.ALIBABA_API_KEY_FOR_LECTIONS || process.env.ALIBABA_API_KEY || '';
+const API_KEY = process.env.VITE_DEEPSEEK_API_KEY || process.env.ALIBABA_API_KEY_FOR_LECTIONS || '';
 
 if (!API_KEY) {
-  console.error("ALIBABA_API_KEY_FOR_LECTIONS is not set");
+  console.error("VITE_DEEPSEEK_API_KEY or ALIBABA_API_KEY_FOR_LECTIONS is not set");
   process.exit(1);
 }
 
 const client = new OpenAI({
   apiKey: API_KEY,
-  baseURL: "https://ws-44u22f3kqqe6ua7h.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+  baseURL: "https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
 });
 
-const MODEL_NAME = 'qwen3.7-max';
+const MODEL_NAME = 'deepseek-v4-pro';
 
 const topicsPath = path.join(__dirname, '../src/data/topics.json');
 const materialsPath = path.join(__dirname, '../src/data/materials.json');
@@ -28,12 +28,13 @@ async function fetchMaterial(topic) {
 Опис теми: "${topic.description}"
 
 Вимоги до формату:
-Тобі потрібно розбити тему на 3-8 логічних БЛОКІВ (мікронавчання). Важливо: блоки не повинні бути гігантськими, але мають бути ДУЖЕ ДЕТАЛЬНИМИ. 
-Кожен блок має бути повноцінною статтею (мінімум 300-500 слів), яка "розжовує" тему. Не пиши просто короткі списки. Якщо це алгоритми чи патерни — розпиши кожен з них детально, з повноцінним прикладом коду для КОЖНОГО (а не тільки для одного).
-Студент вивчає тему майже з нуля. Роби матеріал детальним, але таким, що легко запам'ятовується: використовуй яскраві життєві аналогії та порівняльні таблиці.
-ОБОВ'ЯЗКОВО додавай розгорнуті приклади реального коду (SQL, Python, C++, Java), математичні формули ($latex$), детальні розрахунки складності (Big O) з покроковим поясненням.
+Тобі потрібно розбити тему на 3-10 логічних БЛОКІВ (мікронавчання) В залежності від складності матеріалу. Важливо: блоки не повинні бути гігантськими. Краще зробити більше, блоків ніж 1000 слів в одному блоці. 
+Кожен блок має бути живою, цікавою статтею (мінімум 300-500 слів), яка "розжовує" тему.
+ДУЖЕ ВАЖЛИВО: Уникай великих шматків коду ("стін коду"). Код має займати не більше 15-20% матеріалу. Замість коду використовуй яскраві життєві аналогії, порівняльні таблиці, текстові приклади, пояснення логіки "на пальцях". Студенту на іспиті потрібно розуміти концепції, а не писати багато коду.
+Якщо потрібно показати код, роби його максимально коротким (псевдокод або мінімалістичний сніпет на Python/SQL), лише для ілюстрації найголовнішої ідеї.
+ОБОВ'ЯЗКОВО додавай математичні формули ($latex$) та розрахунки складності (Big O) з покроковим поясненням там, де це доречно.
 Додавай "Пастки ЄФВВ" (типові помилки, на яких ловлять студентів).
-Після кожного блоку обов'язково додавай 3-5 тестових питань у форматі ЄФВВ (з 4 варіантами А, Б, В, Г), які закріплюють щойно прочитаний блок.
+Після кожного блоку обов'язково додавай 5-10 тестових питань у форматі ЄФВВ (з 4 варіантами А, Б, В, Г), які закріплюють щойно прочитаний блок.
 
 УВАГА! Поверни результат СУВОРО у форматі JSON у такому вигляді:
 {
@@ -62,7 +63,7 @@ async function fetchMaterial(topic) {
 
   try {
     console.log(`\n==================== Thinking Process for ${topic.title} ====================`);
-    
+
     const stream = await client.chat.completions.create({
       model: MODEL_NAME,
       messages: [
@@ -78,15 +79,15 @@ async function fetchMaterial(topic) {
 
     for await (const chunk of stream) {
       if (!chunk.choices || chunk.choices.length === 0) continue;
-      
+
       const delta = chunk.choices[0].delta;
-      
+
       if (delta.reasoning_content) {
         if (!isAnswering) {
           process.stdout.write(delta.reasoning_content);
         }
       }
-      
+
       if (delta.content) {
         if (!isAnswering) {
           console.log(`\n==================== Generating JSON ====================`);
@@ -96,8 +97,8 @@ async function fetchMaterial(topic) {
         fullResponse += delta.content;
       }
     }
-    
-    console.log("\n"); 
+
+    console.log("\n");
 
     let jsonStr = fullResponse;
     const jsonMatch = fullResponse.match(/```json\s*([\s\S]*?)\s*```/);
@@ -126,7 +127,7 @@ async function main() {
   }
 
   const topics = JSON.parse(fs.readFileSync(topicsPath, 'utf8'));
-  
+
   let materials = [];
   if (fs.existsSync(materialsPath)) {
     materials = JSON.parse(fs.readFileSync(materialsPath, 'utf8'));
@@ -139,7 +140,7 @@ async function main() {
   for (let i = 0; i < remainingTopics.length; i++) {
     const topic = remainingTopics[i];
     console.log(`\n[${i + 1}/${remainingTopics.length}] Генеруємо матеріали для: ${topic.title}`);
-    
+
     let attempts = 0;
     let content = null;
     while (attempts < 3 && !content) {
@@ -149,7 +150,7 @@ async function main() {
         await delay(2000 * attempts);
       }
     }
-    
+
     if (content) {
       materials.push({
         id: topic.id,
@@ -161,10 +162,10 @@ async function main() {
     } else {
       console.log(`[-] Помилка генерації.`);
     }
-    
+
     await delay(1000);
   }
-  
+
   console.log("Генерацію матеріалів успішно завершено!");
 }
 
