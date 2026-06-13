@@ -18,6 +18,7 @@ const preprocessLatex = (text) => {
 const Materials = () => {
   const [topics, setTopics] = useState([]);
   const [materials, setMaterials] = useState({});
+  const [selectedSubject, setSelectedSubject] = useState('efvv_it');
   const [selectedTopicId, setSelectedTopicId] = useState(null);
   
   // Interactive Block States
@@ -46,12 +47,6 @@ const Materials = () => {
   useEffect(() => {
     if (Array.isArray(topicsData)) {
       setTopics(topicsData);
-      if (topicsData.length > 0) {
-        const firstId = topicsData[0].id;
-        setSelectedTopicId(firstId);
-        const progress = getMaterialProgress();
-        setCurrentBlockIndex(progress[firstId] || 0);
-      }
     }
 
     if (Array.isArray(materialsData)) {
@@ -67,6 +62,29 @@ const Materials = () => {
       setMaterials(matMap);
     }
   }, []);
+
+  useEffect(() => {
+    if (topics.length > 0) {
+      const filtered = topics.filter(t => (t.subjectId || 'efvv_it') === selectedSubject);
+      if (filtered.length > 0) {
+        // If the currently selected topic is not in the filtered list, switch to the first available
+        if (!filtered.find(t => t.id === selectedTopicId)) {
+          const firstId = filtered[0].id;
+          setSelectedTopicId(firstId);
+          const progress = getMaterialProgress();
+          setCurrentBlockIndex(progress[firstId] || 0);
+          setTestAnswers({});
+          setShowResults(false);
+          setRetryCount(0);
+          setShowHints(false);
+        }
+      } else {
+        setSelectedTopicId(null);
+      }
+    }
+  }, [selectedSubject, topics, selectedTopicId]);
+
+
 
   const handleTopicSelect = (id) => {
     setSelectedTopicId(id);
@@ -129,6 +147,8 @@ const Materials = () => {
   const isPassed = testCount === 0 || correctCount >= passThreshold;
   const shouldRevealAnswers = showResults && (isPassed || showHints);
 
+  const filteredTopics = topics.filter(t => (t.subjectId || 'efvv_it') === selectedSubject);
+
   return (
     <div className="container materials-layout" style={{ display: 'flex', gap: '2rem', marginTop: '2rem', height: 'calc(100vh - 120px)', position: 'relative' }}>
       
@@ -168,9 +188,9 @@ const Materials = () => {
         background: 'var(--bg-secondary)',
         borderWidth: isSidebarOpen ? '3px' : '0'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--accent-primary)', fontSize: '1.5rem', textTransform: 'uppercase' }}>
-            <BookOpen size={24} /> Теми ЄФВВ
+            <BookOpen size={24} /> Теми
           </h2>
           {window.innerWidth > 768 && (
             <button className="btn btn-secondary" style={{ padding: '0.5rem' }} onClick={() => setIsSidebarOpen(false)}>
@@ -178,13 +198,31 @@ const Materials = () => {
             </button>
           )}
         </div>
+
+        {/* Subject Tabs */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+          <button 
+            className={`btn ${selectedSubject === 'efvv_it' ? 'btn-primary' : 'btn-secondary'} clip-sharp`} 
+            style={{ flex: 1, padding: '0.5rem', fontSize: '0.9rem' }}
+            onClick={() => setSelectedSubject('efvv_it')}
+          >
+            ІТ (ЄФВВ)
+          </button>
+          <button 
+            className={`btn ${selectedSubject === 'tznk' ? 'btn-primary' : 'btn-secondary'} clip-sharp`} 
+            style={{ flex: 1, padding: '0.5rem', fontSize: '0.9rem' }}
+            onClick={() => setSelectedSubject('tznk')}
+          >
+            Логіка (ТЗНК)
+          </button>
+        </div>
         
-        {topics.length === 0 ? (
+        {filteredTopics.length === 0 ? (
           <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic' }}>
-            Теми ще не згенеровані.
+            Теми ще не згенеровані для цього предмета.
           </div>
         ) : (
-          topics.map(topic => (
+          filteredTopics.map(topic => (
             <button
               key={topic.id}
               className={`btn ${selectedTopicId === topic.id ? 'btn-primary' : 'btn-secondary'} clip-diagonal`}
