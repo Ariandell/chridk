@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || '';
 const API_BASE_URL = import.meta.env.VITE_DEEPSEEK_API_URL || 'https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1';
@@ -29,6 +30,11 @@ const ContextTooltip = () => {
       // If clicking outside, close tooltip
       if (tooltipState.visible) {
         setTooltipState(prev => ({ ...prev, visible: false }));
+        return;
+      }
+
+      // Ignore clicks on interactive elements like buttons, links, etc.
+      if (e.target.closest('button, a, input, select, textarea, .btn')) {
         return;
       }
 
@@ -168,7 +174,7 @@ const ContextTooltip = () => {
         ) : tooltipState.error ? (
           <span style={{ color: 'var(--error)' }}>{tooltipState.error}</span>
         ) : (
-          <span>{tooltipState.explanation}</span>
+          <ReactMarkdown>{tooltipState.explanation}</ReactMarkdown>
         )}
       </div>
     </div>,
