@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { X, Sparkles } from 'lucide-react';
 
 const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || '';
-const API_URL = 'https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions';
+const API_BASE_URL = import.meta.env.VITE_DEEPSEEK_API_URL || 'https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1';
+const API_URL = `${API_BASE_URL}/chat/completions`;
 
 const ContextTooltip = () => {
   const [tooltipState, setTooltipState] = useState({
