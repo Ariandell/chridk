@@ -11,6 +11,7 @@ import materialsData from '../data/materials.json';
 import topicsOldData from '../data/topics_old.json';
 import materialsOldData from '../data/materials_old.json';
 import { getMaterialProgress, saveMaterialProgress } from '../utils/history';
+import DeepSeekAssistant from '../components/DeepSeekAssistant';
 
 const preprocessLatex = (text) => {
   if (!text) return "";
@@ -319,6 +320,11 @@ const Materials = () => {
             <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
               {preprocessLatex(currentBlock.content)}
             </ReactMarkdown>
+
+            <DeepSeekAssistant 
+              contextText={currentBlock.content} 
+              subjectId={selectedSubject} 
+            />
 
             {/* Block Tests */}
             {currentBlock.tests && currentBlock.tests.length > 0 && (

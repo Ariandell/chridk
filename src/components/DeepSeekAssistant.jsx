@@ -5,7 +5,7 @@ import { X, Send, Bot, User, Sparkles } from 'lucide-react';
 const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || '';
 const API_URL = 'https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions';
 
-const DeepSeekAssistant = ({ currentQuestion, answers, germanExps, subjectId }) => {
+const DeepSeekAssistant = ({ currentQuestion, answers, germanExps, subjectId, contextText }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: 'assistant', text: 'Привіт! Я твій AI-помічник DeepSeek. Запитай мене щось про поточне завдання!' }
@@ -34,30 +34,34 @@ const DeepSeekAssistant = ({ currentQuestion, answers, germanExps, subjectId }) 
     setIsLoading(true);
 
     try {
-      // Build context
-      const selectedOptionId = answers ? answers[currentQuestion.id] : null;
-      const selectedOption = currentQuestion.options.find(o => o.id === selectedOptionId);
-      const correctOption = currentQuestion.options.find(o => o.isCorrect);
-      
-      let contextStr = `Ось поточне питання з тесту (${subjectId}):\n`;
-      contextStr += `Текст питання: ${currentQuestion.text}\n\n`;
-      contextStr += `Варіанти:\n`;
-      currentQuestion.options.forEach(o => {
-        contextStr += `- ${o.id}: ${o.text}\n`;
-      });
-      contextStr += `\nПравильна відповідь: ${correctOption ? correctOption.id : 'Невідомо'}\n`;
-      
-      if (selectedOption) {
-        contextStr += `Користувач обрав варіант: ${selectedOption.id}\n`;
-      } else {
-        contextStr += `Користувач ще не обрав варіант.\n`;
+      let contextStr = '';
+      if (contextText) {
+        contextStr = `Ось поточний навчальний матеріал на екрані користувача:\n${contextText.substring(0, 3000)}\n... (текст міг бути обрізаний)`;
+      } else if (currentQuestion) {
+        const selectedOptionId = answers ? answers[currentQuestion.id] : null;
+        const selectedOption = currentQuestion.options.find(o => o.id === selectedOptionId);
+        const correctOption = currentQuestion.options.find(o => o.isCorrect);
+        
+        contextStr = `Ось поточне питання з тесту (${subjectId}):\n`;
+        contextStr += `Текст питання: ${currentQuestion.text}\n\n`;
+        contextStr += `Варіанти:\n`;
+        currentQuestion.options.forEach(o => {
+          contextStr += `- ${o.id}: ${o.text}\n`;
+        });
+        contextStr += `\nПравильна відповідь: ${correctOption ? correctOption.id : 'Невідомо'}\n`;
+        
+        if (selectedOption) {
+          contextStr += `Користувач обрав варіант: ${selectedOption.id}\n`;
+        } else {
+          contextStr += `Користувач ще не обрав варіант.\n`;
+        }
+
+        if (germanExps && germanExps[currentQuestion.id]) {
+           contextStr += `Ось офіційні пояснення: ${JSON.stringify(germanExps[currentQuestion.id])}\n`;
+        }
       }
 
-      if (germanExps && germanExps[currentQuestion.id]) {
-         contextStr += `Ось офіційні пояснення: ${JSON.stringify(germanExps[currentQuestion.id])}\n`;
-      }
-
-      const systemPrompt = `Ти розумний помічник-репетитор з ІТ. Відповідай коротко, стильно та по суті (українською мовою). Ось контекст поточного питання на екрані користувача:\n${contextStr}`;
+      const systemPrompt = `Ти розумний помічник-репетитор з ІТ. Відповідай коротко, стильно та по суті (українською мовою). Ось контекст на екрані користувача:\n${contextStr}`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
