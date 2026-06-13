@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api-proxy/deepseek/:match*",
+      "destination": "https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/:match*"
+    }
+  ]
+}
