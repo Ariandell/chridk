@@ -349,7 +349,7 @@ const Materials = () => {
 
                 {currentBlock.tests.map((test, idx) => (
                   <div key={idx} className="explanation-panel" style={{ marginBottom: '1.5rem', borderColor: showResults && testAnswers[idx] === test.answer ? 'var(--success)' : showResults && testAnswers[idx] !== test.answer ? 'var(--error)' : 'var(--border-color)' }}>
-                    <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', textTransform: 'none', lineHeight: '1.5' }}>
                       <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
                         {preprocessLatex(`${idx + 1}. ${test.question}`)}
                       </ReactMarkdown>
@@ -375,10 +375,12 @@ const Materials = () => {
                             onClick={() => { playSelectSound(); handleOptionSelect(idx, opt.id); }}
                             disabled={showResults}
                           >
-                            <span style={{ fontWeight: 'bold', marginRight: '0.5rem', color: showResults && opt.id === test.answer ? '#fff' : 'inherit' }}>{opt.id}:</span> 
-                            <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]} components={{p: React.Fragment}}>
-                              {preprocessLatex(opt.text)}
-                            </ReactMarkdown>
+                            <span style={{ fontWeight: 'bold', marginRight: '0.5rem', flexShrink: 0, color: showResults && opt.id === test.answer ? '#fff' : 'inherit' }}>{opt.id}:</span> 
+                            <span style={{ flex: 1, fontWeight: 'normal', fontSize: '1rem', lineHeight: '1.5' }}>
+                              <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]} components={{p: React.Fragment}}>
+                                {preprocessLatex(opt.text)}
+                              </ReactMarkdown>
+                            </span>
                           </button>
                         );
                       })}
