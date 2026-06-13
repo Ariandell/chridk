@@ -3,9 +3,10 @@ import { db, auth } from './firebase';
 import { processTestResultForDailies, getDailies, initializeDailies, DAILIES_KEY } from './dailies';
 
 export const HISTORY_KEY = 'edutest_history';
+export const MATERIALS_PROGRESS_KEY = 'edutest_materials_progress';
 
 // Helper to push history to cloud if logged in
-const pushToCloud = async (historyData, dailiesData) => {
+const pushToCloud = async (historyData, dailiesData, materialsProgressData) => {
   const user = auth.currentUser;
   if (!user) return;
   try {
@@ -16,7 +17,13 @@ const pushToCloud = async (historyData, dailiesData) => {
       photoURL: user.photoURL || '',
       lastSync: new Date().toISOString()
     };
-    await setDoc(userRef, { profile, history: historyData, dailies: dailiesData }, { merge: true });
+    
+    const updateData = { profile, history: historyData, dailies: dailiesData };
+    if (materialsProgressData) {
+      updateData.materialsProgress = materialsProgressData;
+    }
+    
+    await setDoc(userRef, updateData, { merge: true });
   } catch (err) {
     console.error('Background sync failed:', err);
   }
@@ -50,7 +57,7 @@ export const syncProgressWithCloud = async (uid) => {
         
         // If we had local items that weren't in cloud, push the merged array back to cloud
         if (hasNewLocalItems) {
-          await pushToCloud(mergedHistory, getDailies());
+          await pushToCloud(mergedHistory, getDailies(), getMaterialProgress());
         }
       }
       if (data && data.dailies) {
@@ -60,11 +67,20 @@ export const syncProgressWithCloud = async (uid) => {
            localStorage.setItem(DAILIES_KEY, JSON.stringify(data.dailies));
         }
       }
+      
+      // Materials progress sync
+      if (data && data.materialsProgress) {
+        const localProgress = getMaterialProgress();
+        // Simple merge: cloud takes precedence for new fields, or just use cloud if local is empty
+        const mergedProgress = { ...localProgress, ...data.materialsProgress };
+        localStorage.setItem(MATERIALS_PROGRESS_KEY, JSON.stringify(mergedProgress));
+      }
+      
     } else {
       // Document doesn't exist yet, push local to cloud
       const local = getHistory();
-      if (local.length > 0 || getDailies()) {
-        await pushToCloud(local, getDailies());
+      if (local.length > 0 || getDailies() || Object.keys(getMaterialProgress()).length > 0) {
+        await pushToCloud(local, getDailies(), getMaterialProgress());
       }
     }
   } catch (err) {
@@ -131,10 +147,35 @@ export const deleteHistoryEntry = (id) => {
     const history = getHistory();
     const updatedHistory = history.filter(entry => entry.id !== id);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
-    pushToCloud(updatedHistory, getDailies());
+    pushToCloud(updatedHistory, getDailies(), getMaterialProgress());
     return updatedHistory;
   } catch (error) {
     console.error("Failed to delete history entry:", error);
     return getHistory();
+  }
+};
+
+// Materials progress
+export const getMaterialProgress = () => {
+  try {
+    const data = localStorage.getItem(MATERIALS_PROGRESS_KEY);
+    return data ? JSON.parse(data) : {};
+  } catch (error) {
+    console.error("Failed to get material progress:", error);
+    return {};
+  }
+};
+
+export const saveMaterialProgress = (topicId, blockIndex) => {
+  try {
+    const progress = getMaterialProgress();
+    progress[topicId] = blockIndex;
+    localStorage.setItem(MATERIALS_PROGRESS_KEY, JSON.stringify(progress));
+    
+    // Background sync
+    pushToCloud(getHistory(), getDailies(), progress);
+    return progress;
+  } catch (error) {
+    console.error("Failed to save material progress:", error);
   }
 };

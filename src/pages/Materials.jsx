@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, AlertCircle, ArrowRight, CheckCircle2, XCircle, Menu, X } from 'lucide-react';
+import { BookOpen, AlertCircle, ArrowRight, CheckCircle2, XCircle, Menu, X, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
@@ -8,6 +8,7 @@ import 'katex/dist/katex.min.css';
 
 import topicsData from '../data/topics.json';
 import materialsData from '../data/materials.json';
+import { getMaterialProgress, saveMaterialProgress } from '../utils/history';
 
 const preprocessLatex = (text) => {
   if (!text) return "";
@@ -23,6 +24,8 @@ const Materials = () => {
   const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
   const [testAnswers, setTestAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [showHints, setShowHints] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
 
   // Handle window resize for sidebar
@@ -44,7 +47,10 @@ const Materials = () => {
     if (Array.isArray(topicsData)) {
       setTopics(topicsData);
       if (topicsData.length > 0) {
-        setSelectedTopicId(topicsData[0].id);
+        const firstId = topicsData[0].id;
+        setSelectedTopicId(firstId);
+        const progress = getMaterialProgress();
+        setCurrentBlockIndex(progress[firstId] || 0);
       }
     }
 
@@ -64,9 +70,12 @@ const Materials = () => {
 
   const handleTopicSelect = (id) => {
     setSelectedTopicId(id);
-    setCurrentBlockIndex(0);
+    const progress = getMaterialProgress();
+    setCurrentBlockIndex(progress[id] || 0);
     setTestAnswers({});
     setShowResults(false);
+    setRetryCount(0);
+    setShowHints(false);
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
     if (window.innerWidth <= 768) {
       setIsSidebarOpen(false);
@@ -74,10 +83,20 @@ const Materials = () => {
   };
 
   const handleNextBlock = () => {
-    setCurrentBlockIndex(prev => prev + 1);
+    const nextIndex = currentBlockIndex + 1;
+    setCurrentBlockIndex(nextIndex);
+    saveMaterialProgress(selectedTopicId, nextIndex);
     setTestAnswers({});
     setShowResults(false);
+    setRetryCount(0);
+    setShowHints(false);
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  };
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
+    setTestAnswers({});
+    setShowResults(false);
   };
 
   const handleOptionSelect = (testIndex, optionId) => {
@@ -99,11 +118,16 @@ const Materials = () => {
 
   // Calculate score for current block
   let correctCount = 0;
+  const testCount = currentBlock?.tests?.length || 0;
   if (showResults && currentBlock && currentBlock.tests) {
     currentBlock.tests.forEach((test, idx) => {
       if (testAnswers[idx] === test.answer) correctCount++;
     });
   }
+
+  const passThreshold = testCount; // 100% required
+  const isPassed = testCount === 0 || correctCount >= passThreshold;
+  const shouldRevealAnswers = showResults && (isPassed || showHints);
 
   return (
     <div className="container materials-layout" style={{ display: 'flex', gap: '2rem', marginTop: '2rem', height: 'calc(100vh - 120px)', position: 'relative' }}>
@@ -259,7 +283,7 @@ const Materials = () => {
                         const isSelected = testAnswers[idx] === opt.id;
                         let btnClass = "btn btn-secondary";
                         
-                        if (showResults) {
+                        if (shouldRevealAnswers) {
                           if (opt.id === test.answer) btnClass += " correct";
                           else if (isSelected) btnClass += " wrong";
                         } else if (isSelected) {
@@ -283,7 +307,7 @@ const Materials = () => {
                       })}
                     </div>
 
-                    {showResults && (
+                    {shouldRevealAnswers && (
                       <div className="animate-fade-in" style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(0,0,0,0.3)', borderLeft: `4px solid ${testAnswers[idx] === test.answer ? 'var(--success)' : 'var(--error)'}` }}>
                         <strong style={{ color: testAnswers[idx] === test.answer ? 'var(--success)' : 'var(--error)' }}>
                           {testAnswers[idx] === test.answer ? '✅ Правильно!' : `❌ Неправильно. Правильна відповідь: ${test.answer}`}
@@ -309,10 +333,23 @@ const Materials = () => {
                   </button>
                 ) : (
                   <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                    <div style={{ fontSize: '1.2rem', marginBottom: '1.5rem', fontWeight: 'bold', color: correctCount === currentBlock.tests.length ? 'var(--success)' : 'var(--accent-yellow)' }}>
-                      Ви відповіли правильно на {correctCount} з {currentBlock.tests.length} питань!
+                    <div style={{ fontSize: '1.2rem', marginBottom: '1.5rem', fontWeight: 'bold', color: isPassed ? 'var(--success)' : 'var(--error)' }}>
+                      Ви відповіли правильно на {correctCount} з {testCount} питань.
+                      {!isPassed && <div style={{ fontSize: '1rem', marginTop: '0.5rem', color: 'var(--text-secondary)' }}>Для переходу далі потрібно відповісти правильно на всі питання (100%).</div>}
                     </div>
-                    {currentBlockIndex < blocks.length - 1 ? (
+                    
+                    {!isPassed ? (
+                      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <button className="btn btn-secondary clip-diagonal" onClick={handleRetry} style={{ fontSize: '1.2rem', padding: '1rem 2rem' }}>
+                          Спробувати ще раз <RefreshCw style={{ marginLeft: '0.5rem' }} size={18} />
+                        </button>
+                        {retryCount >= 2 && !showHints && (
+                          <button className="btn btn-secondary clip-diagonal" onClick={() => setShowHints(true)} style={{ fontSize: '1.2rem', padding: '1rem 2rem', opacity: 0.8, borderColor: 'var(--accent-yellow)', color: 'var(--accent-yellow)' }}>
+                            Показати підказки
+                          </button>
+                        )}
+                      </div>
+                    ) : currentBlockIndex < blocks.length - 1 ? (
                       <button className="btn btn-primary clip-diagonal" onClick={handleNextBlock} style={{ fontSize: '1.2rem', padding: '1rem 2rem' }}>
                         Наступний блок <ArrowRight style={{ marginLeft: '0.5rem' }} />
                       </button>
