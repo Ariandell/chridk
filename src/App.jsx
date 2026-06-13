@@ -9,10 +9,12 @@ import History from './pages/History';
 import Braindead from './pages/Braindead';
 import Admin from './pages/Admin';
 import Materials from './pages/Materials';
+import ContextTooltip from './components/ContextTooltip';
 
 function App() {
   return (
     <>
+      <ContextTooltip />
       <div className="bg-blob blob-1"></div>
       <div className="bg-blob blob-2"></div>
       <Header />

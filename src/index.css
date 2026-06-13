@@ -392,7 +392,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Gemini Assistant Mobile Responsive */
-.gemini-window {
+.deepseek-window {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -407,7 +407,7 @@ h1, h2, h3, h4, h5, h6 {
   clip-path: polygon(0 0, 100% 0, 100% 98%, 98% 100%, 0 100%);
 }
 
-.gemini-fab {
+.deepseek-fab {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -462,7 +462,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1rem;
   }
 
-  .gemini-window {
+  .deepseek-window {
     width: 90%;
     height: 60vh;
     bottom: 10px;
@@ -839,7 +839,7 @@ h1, h2, h3, h4, h5, h6 {
     gap: 0.4rem !important;
   }
 
-  .gemini-btn-text {
+  .deepseek-btn-text {
     display: none !important;
   }
 
@@ -966,4 +966,31 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(217, 15, 35, 0.1);
   color: var(--accent-primary);
   font-weight: 800;
+}
+
+/* Context Tooltip */
+.context-tooltip-overlay {
+  position: absolute;
+  background: var(--bg-secondary);
+  border: 2px solid var(--accent-primary);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  max-width: 300px;
+  z-index: 9999;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text-primary);
+  animation: fadeIn 0.2s ease-out;
+}
+.context-tooltip-header {
+  font-weight: 800;
+  color: var(--accent-primary);
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.context-tooltip-body {
+  font-size: 0.9rem;
+  line-height: 1.4;
 }

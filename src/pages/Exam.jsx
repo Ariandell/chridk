@@ -20,7 +20,7 @@ const preprocessLatex = (text) => {
   return text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$').replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
 };
 import { getImagePath } from '../utils/imagePath';
-import GeminiAssistant from '../components/GeminiAssistant';
+import DeepSeekAssistant from '../components/DeepSeekAssistant';
 import TranslatorTooltip from '../components/TranslatorTooltip';
 import { playSelectSound } from '../utils/sound';
 import { getSessionById } from '../utils/testModes';
@@ -298,7 +298,7 @@ const Exam = () => {
       {/* Portal Exam Controls to the Global Header */}
       {portalTarget && createPortal(
         <>
-          <GeminiAssistant 
+          <DeepSeekAssistant 
             currentQuestion={currentQuestion} 
             answers={answers} 
             germanExps={germanExps} 

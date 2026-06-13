@@ -8,6 +8,8 @@ import 'katex/dist/katex.min.css';
 
 import topicsData from '../data/topics.json';
 import materialsData from '../data/materials.json';
+import topicsOldData from '../data/topics_old.json';
+import materialsOldData from '../data/materials_old.json';
 import { getMaterialProgress, saveMaterialProgress } from '../utils/history';
 
 const preprocessLatex = (text) => {
@@ -45,12 +47,10 @@ const Materials = () => {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    if (Array.isArray(topicsData)) {
-      setTopics(topicsData);
-    }
+    let combinedTopics = [...(Array.isArray(topicsData) ? topicsData : [])];
+    const matMap = {};
 
     if (Array.isArray(materialsData)) {
-      const matMap = {};
       materialsData.forEach(mat => {
         // Fallback for old content format
         if (mat.blocks) {
@@ -59,8 +59,30 @@ const Materials = () => {
           matMap[mat.id] = [{ title: mat.title, content: mat.content, tests: [] }];
         }
       });
-      setMaterials(matMap);
     }
+
+    if (Array.isArray(topicsOldData) && Array.isArray(materialsOldData)) {
+      const oldItTopics = topicsOldData.filter(t => t.subjectId === 'efvv_it' || !t.subjectId);
+      
+      oldItTopics.forEach(oldTopic => {
+        const oldMat = materialsOldData.find(m => m.id === oldTopic.id);
+        if (oldMat && oldMat.blocks && oldMat.blocks.length > 0) {
+          const newId = `old_${oldTopic.id}`;
+          
+          combinedTopics.push({
+            ...oldTopic,
+            id: newId,
+            title: `(Дод.) ${oldTopic.title}`,
+            description: `⚠️ Це додатковий матеріал із попередньої версії курсу. Деякі питання можуть не повністю збігатися з новою деталізованою програмою ЄФВВ.\n\n${oldTopic.description}`
+          });
+          
+          matMap[newId] = oldMat.blocks;
+        }
+      });
+    }
+
+    setTopics(combinedTopics);
+    setMaterials(matMap);
   }, []);
 
   useEffect(() => {

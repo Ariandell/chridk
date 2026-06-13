@@ -1,0 +1,8 @@
+﻿id,
+apiKey,sk-ws-H.IRIEEE.p8y0.MEYCIQCiNFibO9kjQqMxSGtStFFkor5Fivkx-qatNHoSjArPYAIhAJeRWI-QdOO9-Nks2KCjG3QcCDIFwEQ7Xw0OssfESnVR
+apiHost,ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com
+openAiCompatible,https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+dashScope,https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/api/v1
+description,
+workspaceName,Default Workspace
+workspaceId,ws-1c5et31etynaozlt

@@ -1,15 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MessageSquare, X, Send, Bot, User, Sparkles } from 'lucide-react';
+import { X, Send, Bot, User, Sparkles } from 'lucide-react';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-// Using user's specific gemini model
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${API_KEY}`;
+const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || '';
+const API_URL = 'https://ws-1c5et31etynaozlt.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions';
 
-const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) => {
+const DeepSeekAssistant = ({ currentQuestion, answers, germanExps, subjectId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'model', text: 'Привіт! Я твій AI-помічник. Запитай мене щось про поточне завдання!' }
+    { role: 'assistant', text: 'Привіт! Я твій AI-помічник DeepSeek. Запитай мене щось про поточне завдання!' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +35,7 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
 
     try {
       // Build context
-      const selectedOptionId = answers[currentQuestion.id];
+      const selectedOptionId = answers ? answers[currentQuestion.id] : null;
       const selectedOption = currentQuestion.options.find(o => o.id === selectedOptionId);
       const correctOption = currentQuestion.options.find(o => o.isCorrect);
       
@@ -58,14 +57,25 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
          contextStr += `Ось офіційні пояснення: ${JSON.stringify(germanExps[currentQuestion.id])}\n`;
       }
 
-      const prompt = `Ти розумний помічник-репетитор у стилі гри Persona 5. Відповідай коротко, стильно та по суті (українською мовою). Ось контекст поточного питання на екрані користувача:\n${contextStr}\n\nКористувач запитує: ${userMessage}`;
+      const systemPrompt = `Ти розумний помічник-репетитор з ІТ. Відповідай коротко, стильно та по суті (українською мовою). Ось контекст поточного питання на екрані користувача:\n${contextStr}`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7 }
+          model: 'deepseek-v4-flash',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages.filter(m => m.role !== 'assistant' || m.text !== 'Привіт! Я твій AI-помічник DeepSeek. Запитай мене щось про поточне завдання!').map(m => ({
+              role: m.role,
+              content: m.text
+            })),
+            { role: 'user', content: userMessage }
+          ],
+          temperature: 0.7
         })
       });
 
@@ -74,12 +84,12 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
       }
 
       const data = await response.json();
-      const modelReply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Вибач, я втратив зв\'язок з Метавсесвітом.';
+      const modelReply = data.choices?.[0]?.message?.content || 'Вибач, я втратив зв\'язок з сервером.';
 
-      setMessages(prev => [...prev, { role: 'model', text: modelReply }]);
+      setMessages(prev => [...prev, { role: 'assistant', text: modelReply }]);
     } catch (err) {
       console.error(err);
-      setMessages(prev => [...prev, { role: 'model', text: 'Помилка підключення до API.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', text: 'Помилка підключення до API.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -87,32 +97,30 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
 
   return (
     <>
-      {/* Header Button */}
       <button 
         className="btn btn-primary clip-diagonal"
         onClick={() => setIsOpen(true)}
         style={{ display: isOpen ? 'none' : 'flex', padding: '0.5rem 1rem', gap: '0.5rem', background: 'var(--accent-secondary)', borderColor: 'var(--accent-secondary)' }}
       >
-        <Sparkles size={18} /> <span className="gemini-btn-text">GEMINI</span>
+        <Sparkles size={18} /> <span className="deepseek-btn-text">DEEPSEEK</span>
       </button>
 
-      {/* Chat Window Portaled to Body to escape Header CSS constraints */}
       {isOpen && createPortal(
-        <div className="gemini-window">
-          <div className="gemini-header" style={{
+        <div className="deepseek-window">
+          <div className="deepseek-header" style={{
             background: 'var(--accent-primary)', color: 'white', padding: '1rem',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             borderBottom: '2px solid var(--text-primary)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '900' }}>
-              <Bot size={24} /> GEMINI NAVIGATOR
+              <Bot size={24} /> DEEPSEEK NAVIGATOR
             </div>
             <button onClick={() => setIsOpen(false)} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
               <X size={24} />
             </button>
           </div>
 
-          <div className="gemini-messages" style={{
+          <div className="deepseek-messages" style={{
             flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem',
             background: 'var(--bg-primary)'
           }}>
@@ -140,7 +148,7 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
             ))}
             {isLoading && (
               <div style={{ alignSelf: 'flex-start', color: 'var(--text-secondary)', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                Gemini аналізує...
+                DeepSeek аналізує...
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -173,4 +181,4 @@ const GeminiAssistant = ({ currentQuestion, answers, germanExps, subjectId }) =>
   );
 };
 
-export default GeminiAssistant;
+export default DeepSeekAssistant;
