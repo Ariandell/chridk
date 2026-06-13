@@ -16,7 +16,12 @@ const DeepSeekAssistant = ({ currentQuestion, answers, germanExps, subjectId, co
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [portalTarget, setPortalTarget] = useState(null);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    setPortalTarget(document.getElementById('header-portal-target'));
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,15 +108,19 @@ const DeepSeekAssistant = ({ currentQuestion, answers, germanExps, subjectId, co
     }
   };
 
+  const triggerButton = (
+    <button 
+      className="btn btn-primary clip-diagonal"
+      onClick={() => setIsOpen(true)}
+      style={{ display: isOpen ? 'none' : 'flex', padding: '0.5rem 1rem', gap: '0.5rem', background: 'var(--accent-secondary)', borderColor: 'var(--accent-secondary)' }}
+    >
+      <Sparkles size={18} /> <span className="deepseek-btn-text">DEEPSEEK</span>
+    </button>
+  );
+
   return (
     <>
-      <button 
-        className="btn btn-primary clip-diagonal"
-        onClick={() => setIsOpen(true)}
-        style={{ display: isOpen ? 'none' : 'flex', padding: '0.5rem 1rem', gap: '0.5rem', background: 'var(--accent-secondary)', borderColor: 'var(--accent-secondary)' }}
-      >
-        <Sparkles size={18} /> <span className="deepseek-btn-text">DEEPSEEK</span>
-      </button>
+      {portalTarget ? createPortal(triggerButton, portalTarget) : triggerButton}
 
       {isOpen && createPortal(
         <div className="deepseek-window">
