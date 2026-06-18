@@ -148,24 +148,6 @@ const Exam = () => {
 
       setTimeLeft((prev) => {
         const nextTime = prev - deltaSecs;
-        if (nextTime <= 1 && prev > 1) {
-          clearInterval(timer);
-          // Manually handle finish to avoid stale closure
-          setIsFinished(true);
-          localStorage.removeItem(`exam_progress_${subjectId}_${sessionId}`);
-          
-          let score = 0;
-          data.questions.forEach(q => {
-            const selectedId = answersRef.current[q.id];
-            if (selectedId) {
-              const option = q.options.find(o => o.id === selectedId);
-              if (option && option.isCorrect) score++;
-            }
-          });
-          saveTestResult(subjectId, sessionId, data.title, score, data.questions.length, answersRef.current);
-          navigate('/results', { state: { data, answers: answersRef.current, subjectId } });
-          return 0;
-        }
         return Math.max(0, nextTime);
       });
     }, 1000);
@@ -322,16 +304,7 @@ const Exam = () => {
               ЗАМОРОЖЕНО
             </div>
           )}
-          <div className={`timer ${timeLeft < 300 ? 'warning' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isPaused ? 0.5 : 1, fontSize: '1.1rem', fontWeight: '900', color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', minWidth: '85px', justifyContent: 'center' }}>
-            <Clock size={18} />
-            {formatTime(timeLeft)}
-          </div>
-          <button className="btn btn-secondary" onClick={togglePause} title={isPaused ? "Розморозити" : "Заморозити час"} style={{ padding: '0.4rem' }}>
-            {isPaused ? <Play size={16} /> : <Pause size={16} />}
-          </button>
-          <button className="btn btn-secondary" onClick={handleResetTimer} title="Скинути таймер" style={{ padding: '0.4rem' }}>
-            <RefreshCw size={16} />
-          </button>
+          {/* Timer and pause buttons removed per user request */}
         </>,
         portalTarget
       )}
